@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Willsmt",email = "willian_marthins@hotmail.com"}
 ]
-requires-python = "^3.14"
+requires-python = ">=3.14"
 dependencies = [
     "django (>=6.0.7,<7.0.0)",
     "djangorestframework (>=3.17.1,<4.0.0)",
@@ -19,3 +19,19 @@ dependencies = [
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.16.0,<0.17.0)"
+]
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+extend-select = []
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100

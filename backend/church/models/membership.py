@@ -38,8 +38,16 @@ class Membership(models.Model):
             models.CheckConstraint(
                 name="membership_role_scope",
                 condition=(
-                    (Q(role__in=["member", "cell_leader"]) & Q(celula__isnull=False) & Q(rede__isnull=True))
-                    | (Q(role="network_leader") & Q(celula__isnull=True) & Q(rede__isnull=False))
+                    (
+                        Q(role__in=["member", "cell_leader"])
+                        & Q(celula__isnull=False)
+                        & Q(rede__isnull=True)
+                    )
+                    | (
+                        Q(role="network_leader")
+                        & Q(celula__isnull=True)
+                        & Q(rede__isnull=False)
+                    )
                     | (Q(role="pastor") & Q(celula__isnull=True) & Q(rede__isnull=True))
                 ),
             ),

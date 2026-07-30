@@ -9,7 +9,10 @@ class LoginTests(APITestCase):
     def setUp(self):
         self.url = reverse("accounts:login")
         User.objects.create_user(
-            username="joao", email="joao@test.com", password="SenhaForte123", nome="João"
+            username="joao",
+            email="joao@test.com",
+            password="SenhaForte123",
+            nome="João",
         )
 
     def test_login_sucesso(self):

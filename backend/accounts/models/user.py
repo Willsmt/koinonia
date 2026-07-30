@@ -9,7 +9,7 @@ class User(AbstractUser):
     telefone = models.CharField(
         "telefone",
         max_length=20,
-        null=True,   # permite vários sem telefone sob o unique
+        null=True,  # permite vários sem telefone sob o unique
         blank=True,
         unique=True,
     )

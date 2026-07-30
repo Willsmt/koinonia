@@ -27,18 +27,24 @@ class RegisterTests(APITestCase):
         self.assertNotEqual(user.password, "SenhaForte123")
 
     def test_cadastro_username_duplicado(self):
-        User.objects.create_user(username="maria", email="x@test.com", password="Zxc!2025abc")
+        User.objects.create_user(
+            username="maria", email="x@test.com", password="Zxc!2025abc"
+        )
         resp = self.client.post(self.url, self.payload, format="json")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("username", resp.data)
 
     def test_cadastro_email_duplicado(self):
-        User.objects.create_user(username="outro", email="maria@test.com", password="Zxc!2025abc")
+        User.objects.create_user(
+            username="outro", email="maria@test.com", password="Zxc!2025abc"
+        )
         resp = self.client.post(self.url, self.payload, format="json")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("email", resp.data)
 
     def test_cadastro_senha_fraca(self):
-        resp = self.client.post(self.url, {**self.payload, "password": "123"}, format="json")
+        resp = self.client.post(
+            self.url, {**self.payload, "password": "123"}, format="json"
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("password", resp.data)

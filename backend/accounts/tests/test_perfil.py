@@ -10,8 +10,11 @@ class PerfilTests(APITestCase):
     def setUp(self):
         self.url = reverse("accounts:me")
         self.user = User.objects.create_user(
-            username="ana", email="ana@test.com", password="SenhaForte123",
-            nome="Ana Souza", apelido="Aninha",
+            username="ana",
+            email="ana@test.com",
+            password="SenhaForte123",
+            nome="Ana Souza",
+            apelido="Aninha",
         )
         self.token = Token.objects.create(user=self.user)
 
@@ -19,7 +22,9 @@ class PerfilTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
 
     def test_me_sem_token_401(self):
-        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(
+            self.client.get(self.url).status_code, status.HTTP_401_UNAUTHORIZED
+        )
 
     def test_me_com_token_dados_certos(self):
         self._auth()
