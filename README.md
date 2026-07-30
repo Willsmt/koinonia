@@ -41,7 +41,7 @@ koinonia/
 ├── backend/ # API Django + DRF
 └── frontend/ # SPA React
 
-## API — Accounts (ciclo 1)
+## API — Accounts
 
 Base: `/api/accounts/`
 
@@ -82,3 +82,37 @@ A invariante papel↔escopo é garantida em duas camadas: validação no seriali
 
 **Bootstrap.** O superuser Django cria as redes/células pelo `/admin/` e promove
 o primeiro pastor criando um `Membership` com `role=pastor`.
+
+### Posts (postagens, escopos e feed)
+
+Base: `/api/posts/` — todas as rotas exigem autenticação (Token).
+
+| Rota               | Métodos     | Observação         |
+| ------------------ | ----------- | ------------------ |
+| `/api/posts/`      | GET, POST   | Ver escopo abaixo  |
+| `/api/posts/{id}/` | GET, DELETE | DELETE só do autor |
+
+Edição (PUT/PATCH) desabilitada — posts não são editáveis. Exclusão restrita ao
+autor do post.
+
+**Escopo do post.** Todo post pertence a **um** escopo, com o alvo garantido por
+`CheckConstraint` (célula→célula, rede→rede, global→sem alvo). O escopo define
+quem lê e quem escreve:
+
+| Escopo   | Quem lê                                         | Quem escreve                   |
+| -------- | ----------------------------------------------- | ------------------------------ |
+| `celula` | membros da célula + líderes acima na hierarquia | membro/líder da própria célula |
+| `rede`   | quem pertence à rede + líderes acima            | líder da rede, pastor          |
+| `global` | qualquer autenticado (igreja inteira)           | qualquer autenticado           |
+
+A leitura segue o scoping de hierarquia do `Membership` (ver **Modelo de papéis**
+acima): quanto mais alto o papel, mais largo enxerga. Post fora do escopo do
+usuário retorna **404** — não 403; o objeto nem aparece no queryset.
+
+**Feed.** O `GET /api/posts/` já retorna a lista escopada por hierarquia. Os feeds
+nomeados (global por _follow_, mais célula e rede) chegam no módulo de interações,
+junto do model `Follow`.
+
+**Autoria.** `author` é sempre o usuário real, carimbado no servidor. Líder de
+célula pode assinar um post da própria célula via `posted_as` (a voz institucional
+da célula), sem perder o registro de quem escreveu.
