@@ -1,6 +1,9 @@
 from django.db.models import Q
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from interactions.models import Follow
 from posts.models import Post
 from posts.serializers import PostSerializer
 
@@ -20,28 +23,48 @@ class PostViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "delete", "head", "options"]
 
     def get_queryset(self):
-        user = self.request.user
-        m = getattr(user, "membership", None)
-
-        # global é legível pra igreja toda; o follow filtra só o feed global
-        visivel = Q(escopo=Post.Escopo.GLOBAL)
-
-        if m is not None:
-            if m.role in ("pastor", "network_leader"):
-                visivel |= Q(escopo__in=[Post.Escopo.CELULA, Post.Escopo.REDE])
-            elif m.role == "cell_leader":
-                rede_id = (
-                    m.celula.rede_id
-                )  # rede_efetiva; celula é NOT NULL p/ esse papel
-                visivel |= Q(escopo=Post.Escopo.CELULA, celula__rede_id=rede_id)
-                visivel |= Q(escopo=Post.Escopo.REDE, rede_id=rede_id)
-            elif m.role == "member":
-                visivel |= Q(escopo=Post.Escopo.CELULA, celula_id=m.celula_id)
-                visivel |= Q(escopo=Post.Escopo.REDE, rede_id=m.celula.rede_id)
-
-        return Post.objects.filter(visivel).select_related(
+        return Post.objects.readable_by(self.request.user).select_related(
             "author", "posted_as", "celula", "rede"
         )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=False, methods=["get"])
+    def feed_global(self, request):
+        # timeline por follow: posts globais de quem você segue (+ os seus)
+        seguidos = Follow.objects.filter(follower=request.user).values_list(
+            "followed_id", flat=True
+        )
+        qs = (
+            Post.objects.filter(escopo=Post.Escopo.GLOBAL)
+            .filter(Q(author_id__in=seguidos) | Q(author=request.user))
+            .select_related("author", "posted_as", "celula", "rede")
+        )
+        return Response(self.get_serializer(qs, many=True).data)
+
+    @action(detail=False, methods=["get"])
+    def feed_celula(self, request):
+        # pertencimento: só a célula que você ancora (não a rede toda)
+        m = getattr(request.user, "membership", None)
+        celula_id = getattr(m, "celula_id", None)
+        qs = Post.objects.none()
+        if celula_id is not None:
+            qs = Post.objects.filter(
+                escopo=Post.Escopo.CELULA, celula_id=celula_id
+            ).select_related("author", "posted_as", "celula", "rede")
+        return Response(self.get_serializer(qs, many=True).data)
+
+    @action(detail=False, methods=["get"])
+    def feed_rede(self, request):
+        # pertencimento: a rede que você ancora (via célula, ou direta p/ liderança)
+        m = getattr(request.user, "membership", None)
+        rede_id = None
+        if m is not None:
+            rede_id = m.rede_id or (m.celula.rede_id if m.celula_id else None)
+        qs = Post.objects.none()
+        if rede_id is not None:
+            qs = Post.objects.filter(
+                escopo=Post.Escopo.REDE, rede_id=rede_id
+            ).select_related("author", "posted_as", "celula", "rede")
+        return Response(self.get_serializer(qs, many=True).data)

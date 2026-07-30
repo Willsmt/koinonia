@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
+from posts.models.queryset import PostQuerySet
+
 
 class Post(models.Model):
     class Escopo(models.TextChoices):
@@ -38,6 +40,7 @@ class Post(models.Model):
     )
     conteudo = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    objects = PostQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]
