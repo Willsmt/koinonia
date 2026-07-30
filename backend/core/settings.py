@@ -130,7 +130,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# AUTH_USER_MODEL = 'accounts.User'  # descomentar quando criar o model
+AUTH_USER_MODEL = 'accounts.User'  
 
 # Django REST Framework
 REST_FRAMEWORK = {

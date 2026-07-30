@@ -39,3 +39,17 @@ poetry run python manage.py runserver
 koinonia/
 ├── backend/ # API Django + DRF
 └── frontend/ # SPA React
+
+## API — Accounts (ciclo 1)
+
+Base: `/api/accounts/`
+
+| Método | Rota         | Auth      | Descrição                                  |
+|--------|--------------|-----------|--------------------------------------------|
+| POST   | `/register/` | pública   | Cadastro. Retorna `token` + dados do user  |
+| POST   | `/login/`    | pública   | Login por `username` + `password` → `token`|
+| GET    | `/me/`       | token     | Perfil do usuário autenticado              |
+| PATCH  | `/me/`       | token     | Atualiza perfil (nome, apelido, bio, etc.) |
+
+Auth por token DRF: header `Authorization: Token <token>`.
+Exibição de nome: `nome_exibicao` usa o `apelido`; se vazio, cai no `nome`.
