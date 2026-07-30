@@ -109,10 +109,38 @@ A leitura segue o scoping de hierarquia do `Membership` (ver **Modelo de papéis
 acima): quanto mais alto o papel, mais largo enxerga. Post fora do escopo do
 usuário retorna **404** — não 403; o objeto nem aparece no queryset.
 
-**Feed.** O `GET /api/posts/` já retorna a lista escopada por hierarquia. Os feeds
-nomeados (global por _follow_, mais célula e rede) chegam no módulo de interações,
-junto do model `Follow`.
+**Feeds nomeados.** Além do `GET /api/posts/` (lista escopada por hierarquia),
+há três feeds como sub-rotas:
+
+| Rota                      | Timeline por  | Conteúdo                                   |
+| ------------------------- | ------------- | ------------------------------------------ |
+| `/api/posts/feed_global/` | _follow_      | posts globais de quem você segue + os seus |
+| `/api/posts/feed_celula/` | pertencimento | posts da célula que você ancora            |
+| `/api/posts/feed_rede/`   | pertencimento | posts da rede que você ancora              |
+
+`feed_global` é curadoria (por `Follow`); `feed_celula`/`feed_rede` são por âncora
+do `Membership` (a célula/rede que você _possui_), não pela visibilidade ampla da
+leitura — um líder de célula lê a rede toda, mas seu feed de célula é só o dele.
 
 **Autoria.** `author` é sempre o usuário real, carimbado no servidor. Líder de
 célula pode assinar um post da própria célula via `posted_as` (a voz institucional
 da célula), sem perder o registro de quem escreveu.
+
+### Interactions (comentários, curtidas e follow)
+
+Base: `/api/interactions/` — todas as rotas exigem autenticação (Token).
+
+| Rota                          | Métodos           | Observação                                    |
+| ----------------------------- | ----------------- | --------------------------------------------- |
+| `/api/interactions/comments/` | GET, POST, DELETE | `?post={id}` filtra por post; DELETE só autor |
+| `/api/interactions/likes/`    | GET, POST, DELETE | `?post={id}` filtra; DELETE só de quem curtiu |
+| `/api/interactions/follows/`  | GET, POST, DELETE | Ver listas abaixo; DELETE só do follower      |
+
+Comentar e curtir exigem **leitura** no post-alvo: o campo `post` só aceita posts
+visíveis ao usuário (mesmo scoping de hierarquia dos posts). Post fora do escopo é
+recusado como pk inválida — não revela que existe. Curtida é única por (post,
+usuário); comentário não tem edição.
+
+**Follow e listas.** `GET /api/interactions/follows/` lista quem **você segue**;
+`?rel=followers` lista quem **segue você**. Não é possível seguir a si mesmo
+(`CheckConstraint` + validação) nem seguir duas vezes (par único).
