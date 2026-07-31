@@ -35,7 +35,7 @@ jobs:
       DB_PORT: 5432
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -44,7 +44,9 @@ jobs:
         run: pipx install poetry==2.4.1
       - name: Install dependencies (main + dev)
         run: poetry install --with dev --no-root --no-interaction
-      - name: Ruff check
-        run: poetry run ruff check .
+      - name: Ruff (lint + format)
+        run: |
+          poetry run ruff check .
+          poetry run ruff format --check .
       - name: Run test suite
         run: poetry run python manage.py test
