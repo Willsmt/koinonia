@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from ..models import Membership
@@ -21,9 +23,10 @@ class MembershipSerializer(serializers.ModelSerializer):
             "rede_efetiva",
         ]
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_rede_efetiva(self, obj):
-        rede = obj.rede_efetiva
-        return rede.id if rede else None
+            rede = obj.rede_efetiva
+            return rede.id if rede else None
 
     def validate(self, attrs):
         role = attrs.get("role", getattr(self.instance, "role", None))
