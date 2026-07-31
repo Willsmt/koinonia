@@ -31,3 +31,6 @@ frontend/.env*
 
 # Build / estáticos coletados
 staticfiles/
+
+# Uploads (backend)
+backend/media/
