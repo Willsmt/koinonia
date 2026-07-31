@@ -49,8 +49,8 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Install Poetry
-        run: pipx install poetry==2.4.1
+      - name: Install dependencies (main + dev)
+        run: poetry install --with dev --no-root --no-interaction
 
       - name: Install dependencies (main + dev)
         run: poetry install --with dev --no-interaction
