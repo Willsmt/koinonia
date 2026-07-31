@@ -1,4 +1,5 @@
+from .login import LoginView
 from .me import MeView
 from .register import RegisterView
 
-__all__ = ["MeView", "RegisterView"]
+__all__ = ["LoginView", "MeView", "RegisterView"]

@@ -2,6 +2,7 @@ from rest_framework import permissions, viewsets
 
 from interactions.models import Comment
 from interactions.serializers import CommentSerializer
+from interactions.throttling import WriteScopedThrottleMixin
 from posts.models import Post
 
 
@@ -12,7 +13,7 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         return obj.author_id == request.user.id
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
     http_method_names = ["get", "post", "delete", "head", "options"]

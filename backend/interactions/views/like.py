@@ -2,6 +2,7 @@ from rest_framework import permissions, viewsets
 
 from interactions.models import Like
 from interactions.serializers import LikeSerializer
+from interactions.throttling import WriteScopedThrottleMixin
 from posts.models import Post
 
 
@@ -12,7 +13,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.user_id == request.user.id
 
 
-class LikeViewSet(viewsets.ModelViewSet):
+class LikeViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
     serializer_class = LikeSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     http_method_names = ["get", "post", "delete", "head", "options"]

@@ -2,7 +2,7 @@ from rest_framework import permissions, viewsets
 
 from interactions.models import Follow
 from interactions.serializers import FollowSerializer
-
+from interactions.throttling import WriteScopedThrottleMixin
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -10,9 +10,9 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
         return obj.follower_id == request.user.id
 
-
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
     serializer_class = FollowSerializer
+    queryset = Follow.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     http_method_names = ["get", "post", "delete", "head", "options"]
 
