@@ -29,20 +29,14 @@ class InteractionsWriteThrottleTests(PostsBaseTestCase):
         url = reverse("like-list")
         posts_ok = [
             self.post_c1a,
-            Post.objects.create(
-                author=self.membro_c1a, escopo="global", conteudo="p2"
-            ),
-            Post.objects.create(
-                author=self.membro_c1a, escopo="global", conteudo="p3"
-            ),
+            Post.objects.create(author=self.membro_c1a, escopo="global", conteudo="p2"),
+            Post.objects.create(author=self.membro_c1a, escopo="global", conteudo="p3"),
         ]
         for post in posts_ok:
             resp = self.client.post(url, {"post": post.id})
             self.assertEqual(resp.status_code, 201, resp.data)
 
-        p4 = Post.objects.create(
-            author=self.membro_c1a, escopo="global", conteudo="p4"
-        )
+        p4 = Post.objects.create(author=self.membro_c1a, escopo="global", conteudo="p4")
         resp = self.client.post(url, {"post": p4.id})
         self.assertEqual(resp.status_code, 429)
 

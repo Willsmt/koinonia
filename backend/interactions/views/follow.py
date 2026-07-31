@@ -4,11 +4,13 @@ from interactions.models import Follow
 from interactions.serializers import FollowSerializer
 from interactions.throttling import WriteScopedThrottleMixin
 
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.follower_id == request.user.id
+
 
 class FollowViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
     serializer_class = FollowSerializer

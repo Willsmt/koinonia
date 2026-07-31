@@ -1,11 +1,10 @@
 from django.db.models import Q
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from posts.pagination import FeedCursorPagination
 
 from interactions.models import Follow
 from posts.models import Post
+from posts.pagination import FeedCursorPagination
 from posts.serializers import PostSerializer
 
 
@@ -30,6 +29,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
     def _feed_paginado(self, qs):
         """Aplica CursorPagination aos feeds.
 

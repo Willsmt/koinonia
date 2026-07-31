@@ -25,8 +25,8 @@ class MembershipSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(OpenApiTypes.INT)
     def get_rede_efetiva(self, obj):
-            rede = obj.rede_efetiva
-            return rede.id if rede else None
+        rede = obj.rede_efetiva
+        return rede.id if rede else None
 
     def validate(self, attrs):
         role = attrs.get("role", getattr(self.instance, "role", None))
