@@ -76,7 +76,9 @@ class PostSerializer(serializers.ModelSerializer):
         if escopo == Post.Escopo.GLOBAL:
             pass  # qualquer autenticado, inclusive user sem célula
         elif escopo == Post.Escopo.CELULA:
-            if m is None or m.celula_id != celula.id:
+            if m is None:
+                raise PermissionDenied("Você só pode postar na sua própria célula.")
+            if m.role != "pastor" and m.celula_id != celula.id:
                 raise PermissionDenied("Você só pode postar na sua própria célula.")
         elif escopo == Post.Escopo.REDE:
             if m is None or m.role not in ("network_leader", "pastor"):

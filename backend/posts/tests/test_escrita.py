@@ -24,6 +24,21 @@ class EscritaPermissaoTests(PostsBaseTestCase):
         )
         self.assertEqual(resp.status_code, 403)
 
+    def test_lider_de_celula_nao_posta_em_celula_alheia(self):
+        resp = self._postar(
+            self.lider_c1a,
+            {"escopo": "celula", "celula": self.c1b.id, "conteudo": "invadindo"},
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_pastor_posta_em_qualquer_celula(self):
+        resp = self._postar(
+            self.pastor,
+            {"escopo": "celula", "celula": self.c1a.id, "conteudo": "pastor na c1a"},
+        )
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.data["author"], self.pastor.id)
+
     def test_membro_nao_posta_na_rede(self):
         resp = self._postar(
             self.membro_c1a,
