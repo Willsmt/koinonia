@@ -2,6 +2,11 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from accounts.models import User
+from accounts.validators import (
+    normalizar_telefone,
+    normalizar_texto,
+    validar_telefone_unico,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,6 +34,29 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
         ]
         read_only_fields = ["id", "username", "date_joined"]
+        extra_kwargs = {
+            "telefone": {"validators": []},
+        }
+
+    def validate_nome(self, value):
+        nome = normalizar_texto(value)
+        if not nome:
+            raise serializers.ValidationError("Nome não pode ser vazio.")
+        return nome
+
+    def validate_apelido(self, value):
+        return normalizar_texto(value)
+
+    def validate_telefone(self, value):
+        telefone = normalizar_telefone(value)
+        validar_telefone_unico(telefone, instance=self.instance)
+        return telefone
+
+    def validate_foto(self, value):
+        limite = 5 * 1024 * 1024  # 5MB
+        if value and value.size > limite:
+            raise serializers.ValidationError("Imagem maior que 5MB.")
+        return value
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)

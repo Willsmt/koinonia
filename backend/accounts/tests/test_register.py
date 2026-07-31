@@ -48,3 +48,38 @@ class RegisterTests(APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("password", resp.data)
+
+    def test_cadastro_telefone_normaliza_e164(self):
+        resp = self.client.post(
+            self.url, {**self.payload, "telefone": "(11) 98765-4321"}, format="json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(username="maria")
+        self.assertEqual(user.telefone, "+5511987654321")
+
+    def test_cadastro_telefone_invalido_400(self):
+        resp = self.client.post(
+            self.url, {**self.payload, "telefone": "123"}, format="json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("telefone", resp.data)
+
+    def test_cadastro_telefone_duplicado_formato_diferente_400(self):
+        User.objects.create_user(
+            username="outra",
+            email="outra@test.com",
+            password="Zxc!2025abc",
+            telefone="+5511987654321",
+        )
+        resp = self.client.post(
+            self.url, {**self.payload, "telefone": "11987654321"}, format="json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("telefone", resp.data)
+
+    def test_cadastro_nome_so_espaco_400(self):
+        resp = self.client.post(
+            self.url, {**self.payload, "nome": "   "}, format="json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("nome", resp.data)
