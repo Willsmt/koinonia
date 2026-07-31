@@ -55,6 +55,15 @@ Base: `/api/accounts/`
 Auth por token DRF: header `Authorization: Token <token>`.
 Exibição de nome: `nome_exibicao` usa o `apelido`; se vazio, cai no `nome`.
 
+### Validação de campos (accounts)
+
+- **Telefone**: opcional; validado e normalizado para E.164 (`+55DDDNNNNNNNNN`) via `phonenumbers` (região BR). Formato inválido ou já em uso → `400`.
+- **Nome**: obrigatório; não pode ser vazio nem conter só espaços.
+- **Apelido**: opcional; espaços nas pontas são removidos automaticamente.
+- **Foto**: opcional; limite de 5MB.
+
+Toda validação de formato/domínio vive no backend (serializer). O front-end cuida só da UX (ex.: máscara de digitação no campo telefone) — nunca é a fonte de verdade.
+
 ### Church (redes, células e membership)
 
 Base: `/api/church/` — todas as rotas exigem autenticação (Token).
