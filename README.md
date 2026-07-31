@@ -1,5 +1,8 @@
 # koinonia
 
+[![CI](https://github.com/Willsmt/koinonia/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Willsmt/koinonia/actions/workflows/ci.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/willsmt/koinonia/badge)](https://www.codefactor.io/repository/github/willsmt/koinonia)
+
 Rede social para igrejas organizadas em células. Feed global estilo microblog
 combinado com espaços por rede e por célula, com visibilidade e permissões
 derivadas do papel de cada membro na estrutura da igreja.
@@ -41,6 +44,18 @@ koinonia/
 ├── backend/ # API Django + DRF
 └── frontend/ # SPA React
 
+## CI
+
+Pipeline no GitHub Actions (`.github/workflows/ci.yml`) roda em todo push/PR
+para `main`, com dois jobs em paralelo:
+
+- **lint** — `ruff check` + `ruff format --check`
+- **test** — suíte completa (`manage.py test`) contra Postgres real de serviço
+  (não SQLite)
+
+Actions fixadas por commit SHA (hardening de supply chain). Análise estática
+contínua via CodeFactor (badge acima).
+
 ## API — Accounts
 
 Base: `/api/accounts/`
@@ -69,7 +84,7 @@ Toda validação de formato/domínio vive no backend (serializer). O front-end c
 Base: `/api/church/` — todas as rotas exigem autenticação (Token).
 
 | Rota                       | Métodos                       | Quem escreve                           |
-| -------------------------- | ----------------------------- | -------------------------------------- |
+| --------------------------- | ------------------------------ | --------------------------------------- |
 | `/api/church/redes/`       | GET, POST, PUT, PATCH, DELETE | Pastor                                 |
 | `/api/church/celulas/`     | GET, POST, PUT, PATCH, DELETE | Pastor, líder de rede                  |
 | `/api/church/memberships/` | GET, POST, PUT, PATCH, DELETE | Líder de célula, líder de rede, pastor |
@@ -80,11 +95,11 @@ Leitura (GET) liberada para qualquer usuário autenticado.
 `Membership` (relação 1-para-1 com o usuário). O papel define o escopo:
 
 | Papel            | Âncora         | O que enxerga                |
-| ---------------- | -------------- | ---------------------------- |
+| ---------------- | -------------- | ----------------------------- |
 | `member`         | uma célula     | a própria célula             |
 | `cell_leader`    | uma célula     | todas as células da sua rede |
 | `network_leader` | uma rede       | todas as redes               |
-| `pastor`         | igreja inteira | tudo                         |
+| `pastor`         | igreja inteira | tudo                          |
 
 A invariante papel↔escopo é garantida em duas camadas: validação no serializer
 (erro 400 legível) e `CheckConstraint` no banco (rede de segurança).
@@ -97,7 +112,7 @@ o primeiro pastor criando um `Membership` com `role=pastor`.
 Base: `/api/posts/` — todas as rotas exigem autenticação (Token).
 
 | Rota               | Métodos     | Observação         |
-| ------------------ | ----------- | ------------------ |
+| ------------------- | ----------- | ------------------- |
 | `/api/posts/`      | GET, POST   | Ver escopo abaixo  |
 | `/api/posts/{id}/` | GET, DELETE | DELETE só do autor |
 
@@ -108,11 +123,11 @@ autor do post.
 `CheckConstraint` (célula→célula, rede→rede, global→sem alvo). O escopo define
 quem lê e quem escreve:
 
-| Escopo   | Quem lê                                         | Quem escreve                   |
-| -------- | ----------------------------------------------- | ------------------------------ |
-| `celula` | membros da célula + líderes acima na hierarquia | membro/líder da própria célula |
-| `rede`   | quem pertence à rede + líderes acima            | líder da rede, pastor          |
-| `global` | qualquer autenticado (igreja inteira)           | qualquer autenticado           |
+| Escopo   | Quem lê                                         | Quem escreve                    |
+| -------- | ------------------------------------------------ | --------------------------------- |
+| `celula` | membros da célula + líderes acima na hierarquia | membro/líder da própria célula   |
+| `rede`   | quem pertence à rede + líderes acima            | líder da rede, pastor            |
+| `global` | qualquer autenticado (igreja inteira)           | qualquer autenticado             |
 
 A leitura segue o scoping de hierarquia do `Membership` (ver **Modelo de papéis**
 acima): quanto mais alto o papel, mais largo enxerga. Post fora do escopo do
@@ -122,7 +137,7 @@ usuário retorna **404** — não 403; o objeto nem aparece no queryset.
 há três feeds como sub-rotas:
 
 | Rota                      | Timeline por  | Conteúdo                                   |
-| ------------------------- | ------------- | ------------------------------------------ |
+| -------------------------- | -------------- | -------------------------------------------- |
 | `/api/posts/feed_global/` | _follow_      | posts globais de quem você segue + os seus |
 | `/api/posts/feed_celula/` | pertencimento | posts da célula que você ancora            |
 | `/api/posts/feed_rede/`   | pertencimento | posts da rede que você ancora              |
@@ -140,7 +155,7 @@ da célula), sem perder o registro de quem escreveu.
 Base: `/api/interactions/` — todas as rotas exigem autenticação (Token).
 
 | Rota                          | Métodos           | Observação                                    |
-| ----------------------------- | ----------------- | --------------------------------------------- |
+| ------------------------------ | ------------------ | ------------------------------------------------ |
 | `/api/interactions/comments/` | GET, POST, DELETE | `?post={id}` filtra por post; DELETE só autor |
 | `/api/interactions/likes/`    | GET, POST, DELETE | `?post={id}` filtra; DELETE só de quem curtiu |
 | `/api/interactions/follows/`  | GET, POST, DELETE | Ver listas abaixo; DELETE só do follower      |
