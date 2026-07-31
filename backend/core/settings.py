@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "drf_spectacular",
     # Apps locais (bounded contexts)
     "accounts",
     "church",
@@ -139,6 +140,39 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # Throttling — freio baseline global; escopos específicos vivem nas views
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "20/min",
+        "user": "1000/hour",
+        "interactions_write": "30/min",
+        "login": "10/min",
+    },
+    # Paginação — page number como default global; feeds sobrescrevem com cursor
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    # OpenAPI
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# drf-spectacular (OpenAPI 3)
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Koinonia API",
+    "DESCRIPTION": "Rede social de igreja em células — API DRF.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+# Cache — backend explícito é requisito do throttling do DRF (o contador de
+# requisições vive no cache). Sem isso o rate limit não conta e não freia.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "koinonia-throttle",
+    }
 }
 
 # CORS
