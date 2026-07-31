@@ -2,6 +2,7 @@ from django.db.models import Q
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from posts.pagination import FeedCursorPagination
 
 from interactions.models import Follow
 from posts.models import Post
@@ -29,6 +30,17 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+    def _feed_paginado(self, qs):
+        """Aplica CursorPagination aos feeds.
+
+        Os @action não herdam a paginação default da view (que é page
+        number); aqui instanciamos o paginador de cursor direto, mantendo
+        o scroll infinito só nos feeds sem afetar os lists normais.
+        """
+        paginador = FeedCursorPagination()
+        page = paginador.paginate_queryset(qs, self.request, view=self)
+        serializer = self.get_serializer(page, many=True)
+        return paginador.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def feed_global(self, request):
@@ -41,7 +53,7 @@ class PostViewSet(viewsets.ModelViewSet):
             .filter(Q(author_id__in=seguidos) | Q(author=request.user))
             .select_related("author", "posted_as", "celula", "rede")
         )
-        return Response(self.get_serializer(qs, many=True).data)
+        return self._feed_paginado(qs)
 
     @action(detail=False, methods=["get"])
     def feed_celula(self, request):
@@ -53,7 +65,7 @@ class PostViewSet(viewsets.ModelViewSet):
             qs = Post.objects.filter(
                 escopo=Post.Escopo.CELULA, celula_id=celula_id
             ).select_related("author", "posted_as", "celula", "rede")
-        return Response(self.get_serializer(qs, many=True).data)
+        return self._feed_paginado(qs)
 
     @action(detail=False, methods=["get"])
     def feed_rede(self, request):
@@ -67,4 +79,4 @@ class PostViewSet(viewsets.ModelViewSet):
             qs = Post.objects.filter(
                 escopo=Post.Escopo.REDE, rede_id=rede_id
             ).select_related("author", "posted_as", "celula", "rede")
-        return Response(self.get_serializer(qs, many=True).data)
+        return self._feed_paginado(qs)
