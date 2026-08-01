@@ -5,7 +5,9 @@ from reports.models import BugReport
 
 class BugReportSerializer(serializers.ModelSerializer):
     reporter = serializers.PrimaryKeyRelatedField(read_only=True)
-    reporter_username = serializers.CharField(source="reporter.username", read_only=True)
+    reporter_username = serializers.CharField(
+        source="reporter.username", read_only=True
+    )
 
     class Meta:
         model = BugReport

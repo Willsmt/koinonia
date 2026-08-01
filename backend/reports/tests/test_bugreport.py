@@ -41,7 +41,10 @@ class BugReportTests(APITestCase):
 
     def test_autenticado_reporta(self):
         self.client.force_authenticate(self.membro)
-        resp = self.client.post(reverse("bugreport-list"), {"descricao": "botão quebrado", "pagina": "/perfil"})
+        resp = self.client.post(
+            reverse("bugreport-list"),
+            {"descricao": "botão quebrado", "pagina": "/perfil"},
+        )
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.data["reporter"], self.membro.id)
 
@@ -89,7 +92,9 @@ class BugReportTests(APITestCase):
         report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
         self.client.force_authenticate(self.pastor)
         resp = self.client.patch(
-            reverse("bugreport-detail", args=[report.id]), {"resolvido": True}, format="json"
+            reverse("bugreport-detail", args=[report.id]),
+            {"resolvido": True},
+            format="json",
         )
         self.assertEqual(resp.status_code, 200)
         report.refresh_from_db()
@@ -99,7 +104,9 @@ class BugReportTests(APITestCase):
         report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
         self.client.force_authenticate(self.membro)
         resp = self.client.patch(
-            reverse("bugreport-detail", args=[report.id]), {"resolvido": True}, format="json"
+            reverse("bugreport-detail", args=[report.id]),
+            {"resolvido": True},
+            format="json",
         )
         self.assertEqual(resp.status_code, 403)
 
