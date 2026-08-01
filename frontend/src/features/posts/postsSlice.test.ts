@@ -10,6 +10,7 @@ const post: Post = {
   rede: null,
   posted_as: null,
   conteudo: 'oi',
+  imagem: null,
   created_at: '2026-07-31T20:33:59Z',
 }
 
@@ -46,7 +47,10 @@ describe('postsSlice', () => {
 
   it('createPost.fulfilled prepende no feed do escopo certo', () => {
     const initial = reducer(undefined, { type: '@@INIT' })
-    const state = reducer(initial, createPost.fulfilled(post, 'reqId', { escopo: 'global', conteudo: 'oi' }))
+    const formData = new FormData()
+    formData.append('escopo', 'global')
+    formData.append('conteudo', 'oi')
+    const state = reducer(initial, createPost.fulfilled(post, 'reqId', formData))
     expect(state.feeds.global.items[0]).toEqual(post)
   })
 })
