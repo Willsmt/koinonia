@@ -7,6 +7,7 @@ from posts.models import Post
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True)
     author_nome = serializers.CharField(source="author.nome_exibicao", read_only=True)
+    author_foto = serializers.ImageField(source="author.foto", read_only=True)
 
     class Meta:
         model = Post
@@ -14,6 +15,7 @@ class PostSerializer(serializers.ModelSerializer):
             "id",
             "author",
             "author_nome",
+            "author_foto",
             "escopo",
             "celula",
             "rede",
