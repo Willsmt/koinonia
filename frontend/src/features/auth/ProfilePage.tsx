@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchMe, updateProfile } from './profileSlice'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter'
+import { AuthField } from './AuthField'
 import { Avatar } from '../../components/Avatar'
 import { NomeColorido } from '../../components/NomeColorido'
 
@@ -107,154 +108,111 @@ export function ProfilePage() {
   }
 
   if (status === 'loading' || status === 'idle') {
-    return <p className="text-gray-500">Carregando perfil...</p>
+    return <p className="text-ink-subtle">Carregando perfil...</p>
   }
 
   if (!data) {
-    return <p className="text-red-600">Não foi possível carregar o perfil.</p>
+    return <p className="text-danger">Não foi possível carregar o perfil.</p>
   }
 
   return (
-    <div className="max-w-lg space-y-6">
-      <div className="rounded-lg bg-white p-6 shadow">
+    <div className="mx-auto max-w-lg space-y-4 py-6 lg:py-0">
+      <div className="rounded-[6px] bg-surface p-6 shadow-halo-sm">
         <div className="flex items-center gap-4">
           <Avatar src={fotoPreview ?? data.foto} size="h-16 w-16" zoomable />
           <div>
-            <NomeColorido nome={data.nome_exibicao || data.username} cor={data.cor} className="font-semibold" />
-            <p className="text-sm text-gray-500">
+            <NomeColorido nome={data.nome_exibicao || data.username} cor={data.cor} className="font-display text-lg font-semibold" />
+            <p className="text-sm text-ink-subtle">
               @{data.username} · desde {new Date(data.date_joined).toLocaleDateString('pt-BR')}
             </p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-lg bg-white p-6 shadow">
-        <h2 className="text-lg font-semibold">Editar perfil</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-[6px] bg-surface p-6 shadow-halo-sm">
+        <h2 className="font-display text-lg font-semibold text-ink-strong">Editar perfil</h2>
 
         <div>
-          <label htmlFor="foto" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="foto" className="block text-sm font-medium text-ink-muted">
             Foto
           </label>
-          <input id="foto" type="file" accept="image/*" onChange={handleFotoChange} className="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100" />
-        </div>
-
-        <div>
-          <label htmlFor="nome" className="block text-sm font-medium text-gray-700">
-            Nome
-          </label>
           <input
-            id="nome"
-            type="text"
-            {...register('nome')}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+            id="foto"
+            type="file"
+            accept="image/*"
+            onChange={handleFotoChange}
+            className="mt-1 block w-full text-sm text-ink-muted file:mr-4 file:rounded-full file:border-0 file:bg-primary-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
           />
-          {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome.message}</p>}
-          {updateFieldErrors?.nome && <p className="mt-1 text-sm text-red-600">{updateFieldErrors.nome[0]}</p>}
         </div>
 
-        <div>
-          <label htmlFor="apelido" className="block text-sm font-medium text-gray-700">
-            Apelido <span className="text-gray-400">(opcional)</span>
-          </label>
-          <input
-            id="apelido"
-            type="text"
-            {...register('apelido')}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-          />
-          {updateFieldErrors?.apelido && <p className="mt-1 text-sm text-red-600">{updateFieldErrors.apelido[0]}</p>}
-        </div>
+        <AuthField label="Nome" {...register('nome')} error={errors.nome?.message ?? updateFieldErrors?.nome?.[0]} />
+
+        <AuthField
+          label="Apelido"
+          hint="(opcional)"
+          {...register('apelido')}
+          error={updateFieldErrors?.apelido?.[0]}
+        />
+
+        <AuthField
+          label="Email"
+          type="email"
+          {...register('email')}
+          error={errors.email?.message ?? updateFieldErrors?.email?.[0]}
+        />
+
+        <AuthField
+          label="Telefone"
+          hint="(opcional)"
+          type="tel"
+          placeholder="(11) 99999-9999"
+          {...register('telefone', {
+            onChange: (e) => {
+              e.target.value = telefoneMask(e.target.value)
+            },
+          })}
+          error={updateFieldErrors?.telefone?.[0]}
+        />
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            {...register('email')}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-          />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
-          {updateFieldErrors?.email && <p className="mt-1 text-sm text-red-600">{updateFieldErrors.email[0]}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">
-            Telefone <span className="text-gray-400">(opcional)</span>
-          </label>
-          <input
-            id="telefone"
-            type="tel"
-            placeholder="(11) 99999-9999"
-            {...register('telefone', {
-              onChange: (e) => {
-                e.target.value = telefoneMask(e.target.value)
-              },
-            })}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-          />
-          {updateFieldErrors?.telefone && (
-            <p className="mt-1 text-sm text-red-600">{updateFieldErrors.telefone[0]}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
-            Bio <span className="text-gray-400">(opcional)</span>
+          <label htmlFor="bio" className="block text-sm font-medium text-ink-muted">
+            Bio <span className="text-ink-faint">(opcional)</span>
           </label>
           <textarea
             id="bio"
             rows={3}
             {...register('bio')}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+            className="mt-1.5 w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-ink-strong placeholder:text-ink-faint focus:border-primary focus:outline-none"
           />
-          {updateFieldErrors?.bio && <p className="mt-1 text-sm text-red-600">{updateFieldErrors.bio[0]}</p>}
+          {updateFieldErrors?.bio && <p className="mt-1 text-sm text-danger">{updateFieldErrors.bio[0]}</p>}
         </div>
 
-        <fieldset className="space-y-4 border-t pt-4">
-          <legend className="text-sm font-medium text-gray-700">Alterar senha (opcional)</legend>
+        <fieldset className="space-y-4 border-t border-border pt-4">
+          <legend className="text-sm font-medium text-ink-muted">Alterar senha (opcional)</legend>
 
-          <div>
-            <label htmlFor="novaSenha" className="block text-sm font-medium text-gray-700">
-              Nova senha
-            </label>
-            <input
-              id="novaSenha"
-              type="password"
-              {...register('novaSenha')}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            />
-            <PasswordStrengthMeter password={novaSenha} />
-            {errors.novaSenha && <p className="mt-1 text-sm text-red-600">{errors.novaSenha.message}</p>}
-            {updateFieldErrors?.password && (
-              <p className="mt-1 text-sm text-red-600">{updateFieldErrors.password[0]}</p>
-            )}
-          </div>
+          <AuthField
+            label="Nova senha"
+            type="password"
+            {...register('novaSenha')}
+            belowInput={<PasswordStrengthMeter password={novaSenha} />}
+            error={errors.novaSenha?.message ?? updateFieldErrors?.password?.[0]}
+          />
 
-          <div>
-            <label htmlFor="confirmarNovaSenha" className="block text-sm font-medium text-gray-700">
-              Confirmar nova senha
-            </label>
-            <input
-              id="confirmarNovaSenha"
-              type="password"
-              {...register('confirmarNovaSenha')}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            />
-            {errors.confirmarNovaSenha && (
-              <p className="mt-1 text-sm text-red-600">{errors.confirmarNovaSenha.message}</p>
-            )}
-          </div>
+          <AuthField
+            label="Confirmar nova senha"
+            type="password"
+            {...register('confirmarNovaSenha')}
+            error={errors.confirmarNovaSenha?.message}
+          />
         </fieldset>
 
-        {updateError && <p className="text-sm text-red-600">{updateError}</p>}
-        {updateStatus === 'succeeded' && <p className="text-sm text-green-600">Perfil atualizado.</p>}
+        {updateError && <p className="text-sm text-danger">{updateError}</p>}
+        {updateStatus === 'succeeded' && <p className="text-sm text-success">Perfil atualizado.</p>}
 
         <button
           type="submit"
           disabled={updateStatus === 'loading'}
-          className="w-full rounded bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="w-full rounded-full bg-primary py-2 font-medium text-white hover:bg-primary-hover disabled:opacity-50"
         >
           {updateStatus === 'loading' ? 'Salvando...' : 'Salvar alterações'}
         </button>
