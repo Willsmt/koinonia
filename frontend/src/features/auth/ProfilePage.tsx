@@ -185,7 +185,7 @@ export function ProfilePage() {
           <input
             id="telefone"
             type="tel"
-            placeholder="(11) 91234-5678"
+            placeholder="(11) 99999-9999"
             {...register('telefone', {
               onChange: (e) => {
                 e.target.value = telefoneMask(e.target.value)
