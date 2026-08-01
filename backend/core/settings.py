@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "accounts",
     "church",
     "posts",
+    "reports",
     "interactions",
 ]
 

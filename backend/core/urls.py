@@ -14,6 +14,7 @@ urlpatterns = [
     path("api/church/", include("church.urls")),
     path("api/", include("posts.urls")),
     path("api/interactions/", include("interactions.urls")),
+    path("api/reports/", include("reports.urls")),
     # OpenAPI / documentação
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
