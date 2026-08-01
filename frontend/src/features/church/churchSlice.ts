@@ -24,7 +24,6 @@ export interface Rede {
   id: number
   nome: string
   cor: string
-  cor_display: string
 }
 
 export interface DashboardStats {
@@ -45,9 +44,15 @@ interface ChurchState {
   redesStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   allMemberships: Membership[]
   allMembershipsStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
-  createStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
-  createError: string | null
-  createFieldErrors: Record<string, string[]> | null
+  createMembershipStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  createMembershipError: string | null
+  createMembershipFieldErrors: Record<string, string[]> | null
+  createRedeStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  createRedeError: string | null
+  createRedeFieldErrors: Record<string, string[]> | null
+  createCelulaStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  createCelulaError: string | null
+  createCelulaFieldErrors: Record<string, string[]> | null
   dashboard: DashboardStats | null
   dashboardStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
@@ -61,9 +66,15 @@ const initialState: ChurchState = {
   redesStatus: 'idle',
   allMemberships: [],
   allMembershipsStatus: 'idle',
-  createStatus: 'idle',
-  createError: null,
-  createFieldErrors: null,
+  createMembershipStatus: 'idle',
+  createMembershipError: null,
+  createMembershipFieldErrors: null,
+  createRedeStatus: 'idle',
+  createRedeError: null,
+  createRedeFieldErrors: null,
+  createCelulaStatus: 'idle',
+  createCelulaError: null,
+  createCelulaFieldErrors: null,
   dashboard: null,
   dashboardStatus: 'idle',
 }
@@ -117,6 +128,32 @@ export const deleteMembership = createAsyncThunk(
     try {
       await client.delete(`/church/memberships/${id}/`)
       return id
+    } catch (err) {
+      const axiosErr = err as { response?: { data?: unknown } }
+      return rejectWithValue(axiosErr.response?.data)
+    }
+  },
+)
+
+export const createRede = createAsyncThunk(
+  'church/createRede',
+  async (payload: { nome: string; cor: string }, { rejectWithValue }) => {
+    try {
+      const { data } = await client.post('/church/redes/', payload)
+      return data as Rede
+    } catch (err) {
+      const axiosErr = err as { response?: { data?: unknown } }
+      return rejectWithValue(axiosErr.response?.data)
+    }
+  },
+)
+
+export const createCelula = createAsyncThunk(
+  'church/createCelula',
+  async (payload: { nome: string; rede: number }, { rejectWithValue }) => {
+    try {
+      const { data } = await client.post('/church/celulas/', payload)
+      return data as Celula
     } catch (err) {
       const axiosErr = err as { response?: { data?: unknown } }
       return rejectWithValue(axiosErr.response?.data)
@@ -181,26 +218,64 @@ const churchSlice = createSlice({
         state.dashboardStatus = 'failed'
       })
       .addCase(createMembership.pending, (state) => {
-        state.createStatus = 'loading'
-        state.createError = null
-        state.createFieldErrors = null
+        state.createMembershipStatus = 'loading'
+        state.createMembershipError = null
+        state.createMembershipFieldErrors = null
       })
       .addCase(createMembership.fulfilled, (state, action) => {
-        state.createStatus = 'succeeded'
+        state.createMembershipStatus = 'succeeded'
         state.allMemberships = [...state.allMemberships, action.payload]
       })
       .addCase(createMembership.rejected, (state, action) => {
-        state.createStatus = 'failed'
+        state.createMembershipStatus = 'failed'
         const payload = action.payload
         if (payload && typeof payload === 'object') {
-          state.createFieldErrors = payload as Record<string, string[]>
-          state.createError = 'Não foi possível atribuir.'
+          state.createMembershipFieldErrors = payload as Record<string, string[]>
+          state.createMembershipError = 'Não foi possível atribuir.'
         } else {
-          state.createError = 'Erro de conexão com o servidor.'
+          state.createMembershipError = 'Erro de conexão com o servidor.'
         }
       })
       .addCase(deleteMembership.fulfilled, (state, action) => {
         state.allMemberships = state.allMemberships.filter((m) => m.id !== action.payload)
+      })
+      .addCase(createRede.pending, (state) => {
+        state.createRedeStatus = 'loading'
+        state.createRedeError = null
+        state.createRedeFieldErrors = null
+      })
+      .addCase(createRede.fulfilled, (state, action) => {
+        state.createRedeStatus = 'succeeded'
+        state.redes = [...state.redes, action.payload]
+      })
+      .addCase(createRede.rejected, (state, action) => {
+        state.createRedeStatus = 'failed'
+        const payload = action.payload
+        if (payload && typeof payload === 'object') {
+          state.createRedeFieldErrors = payload as Record<string, string[]>
+          state.createRedeError = 'Não foi possível criar a rede.'
+        } else {
+          state.createRedeError = 'Erro de conexão com o servidor.'
+        }
+      })
+      .addCase(createCelula.pending, (state) => {
+        state.createCelulaStatus = 'loading'
+        state.createCelulaError = null
+        state.createCelulaFieldErrors = null
+      })
+      .addCase(createCelula.fulfilled, (state, action) => {
+        state.createCelulaStatus = 'succeeded'
+        state.celulas = [...state.celulas, action.payload]
+      })
+      .addCase(createCelula.rejected, (state, action) => {
+        state.createCelulaStatus = 'failed'
+        const payload = action.payload
+        if (payload && typeof payload === 'object') {
+          state.createCelulaFieldErrors = payload as Record<string, string[]>
+          state.createCelulaError = 'Não foi possível criar a célula.'
+        } else {
+          state.createCelulaError = 'Erro de conexão com o servidor.'
+        }
       })
       .addCase(logout, () => initialState)
   },

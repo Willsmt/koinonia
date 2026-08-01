@@ -7,6 +7,8 @@ import {
   fetchAllMemberships,
   createMembership,
   deleteMembership,
+  createRede,
+  createCelula,
 } from './churchSlice'
 import { searchUsers } from '../people/peopleSlice'
 import { NomeColorido } from '../../components/NomeColorido'
@@ -25,7 +27,7 @@ function opcoesDeRole(role: string | null): string[] {
   return []
 }
 
-export function MembersAdminPage() {
+export function ManagementPage() {
   const dispatch = useAppDispatch()
   const profile = useAppSelector((state) => state.profile.data)
   const {
@@ -34,9 +36,15 @@ export function MembersAdminPage() {
     celulas,
     redes,
     allMemberships,
-    createStatus,
-    createError,
-    createFieldErrors,
+    createMembershipStatus,
+    createMembershipError,
+    createMembershipFieldErrors,
+    createRedeStatus,
+    createRedeError,
+    createRedeFieldErrors,
+    createCelulaStatus,
+    createCelulaError,
+    createCelulaFieldErrors,
   } = useAppSelector((state) => state.church)
   const { results: searchResults } = useAppSelector((state) => state.people)
 
@@ -47,6 +55,12 @@ export function MembersAdminPage() {
   const [novoRoleSelecionado, setNovoRoleSelecionado] = useState('')
   const [novaCelula, setNovaCelula] = useState('')
   const [novaRede, setNovaRede] = useState('')
+
+  const [nomeRedeNova, setNomeRedeNova] = useState('')
+  const [corRedeNova, setCorRedeNova] = useState('#2563eb')
+
+  const [nomeCelulaNova, setNomeCelulaNova] = useState('')
+  const [redeDaCelulaNova, setRedeDaCelulaNova] = useState('')
 
   // derivado direto do papel do ator — quando só existe 1 opção (cell_leader),
   // não tem seletor pra mostrar, então não pode depender de estado sincronizado
@@ -89,12 +103,27 @@ export function MembersAdminPage() {
     dispatch(createMembership(payload))
   }
 
+  function handleCriarRede(e: FormEvent) {
+    e.preventDefault()
+    if (!nomeRedeNova.trim()) return
+    dispatch(createRede({ nome: nomeRedeNova.trim(), cor: corRedeNova }))
+    setNomeRedeNova('')
+  }
+
+  function handleCriarCelula(e: FormEvent) {
+    e.preventDefault()
+    const redeId = role === 'network_leader' ? myMembership?.rede : Number(redeDaCelulaNova)
+    if (!nomeCelulaNova.trim() || !redeId) return
+    dispatch(createCelula({ nome: nomeCelulaNova.trim(), rede: redeId }))
+    setNomeCelulaNova('')
+  }
+
   if (membershipStatus === 'loading' || membershipStatus === 'idle') {
     return <p className="text-gray-500">Carregando...</p>
   }
 
   if (!role || role === 'member') {
-    return <p className="text-gray-500">Você não gerencia membros.</p>
+    return <p className="text-gray-500">Você não gerencia a estrutura da igreja.</p>
   }
 
   const celulasDisponiveis = role === 'network_leader' ? celulas.filter((c) => c.rede === myMembership?.rede) : celulas
@@ -108,8 +137,106 @@ export function MembersAdminPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
+      <h1 className="text-xl font-semibold">Gerenciamento</h1>
+
+      {role === 'pastor' && (
+        <div className="rounded-lg bg-white p-4 shadow">
+          <h2 className="mb-3 text-lg font-semibold">Criar rede</h2>
+          <form onSubmit={handleCriarRede} className="flex items-end gap-2">
+            <div className="flex-1">
+              <label htmlFor="nome-rede" className="block text-sm font-medium text-gray-700">
+                Nome
+              </label>
+              <input
+                id="nome-rede"
+                type="text"
+                value={nomeRedeNova}
+                onChange={(e) => setNomeRedeNova(e.target.value)}
+                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label htmlFor="cor-rede" className="block text-sm font-medium text-gray-700">
+                Cor
+              </label>
+              <input
+                id="cor-rede"
+                type="color"
+                value={corRedeNova}
+                onChange={(e) => setCorRedeNova(e.target.value)}
+                className="mt-1 h-9 w-14 rounded border border-gray-300"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={createRedeStatus === 'loading'}
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+              Criar
+            </button>
+          </form>
+          {createRedeError && <p className="mt-2 text-sm text-red-600">{createRedeError}</p>}
+          {createRedeFieldErrors && (
+            <p className="mt-2 text-sm text-red-600">{Object.values(createRedeFieldErrors).flat().join(' ')}</p>
+          )}
+        </div>
+      )}
+
+      {(role === 'pastor' || role === 'network_leader') && (
+        <div className="rounded-lg bg-white p-4 shadow">
+          <h2 className="mb-3 text-lg font-semibold">Criar célula</h2>
+          <form onSubmit={handleCriarCelula} className="flex items-end gap-2">
+            <div className="flex-1">
+              <label htmlFor="nome-celula" className="block text-sm font-medium text-gray-700">
+                Nome
+              </label>
+              <input
+                id="nome-celula"
+                type="text"
+                value={nomeCelulaNova}
+                onChange={(e) => setNomeCelulaNova(e.target.value)}
+                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+            </div>
+            {role === 'pastor' ? (
+              <div className="flex-1">
+                <label htmlFor="rede-celula" className="block text-sm font-medium text-gray-700">
+                  Rede
+                </label>
+                <select
+                  id="rede-celula"
+                  value={redeDaCelulaNova}
+                  onChange={(e) => setRedeDaCelulaNova(e.target.value)}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                >
+                  <option value="">Selecione...</option>
+                  {redes.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <p className="pb-2 text-sm text-gray-500">Rede: a sua própria (fixo)</p>
+            )}
+            <button
+              type="submit"
+              disabled={createCelulaStatus === 'loading'}
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+              Criar
+            </button>
+          </form>
+          {createCelulaError && <p className="mt-2 text-sm text-red-600">{createCelulaError}</p>}
+          {createCelulaFieldErrors && (
+            <p className="mt-2 text-sm text-red-600">{Object.values(createCelulaFieldErrors).flat().join(' ')}</p>
+          )}
+        </div>
+      )}
+
       <div className="rounded-lg bg-white p-4 shadow">
-        <h1 className="mb-3 text-lg font-semibold">Adicionar membro</h1>
+        <h2 className="mb-3 text-lg font-semibold">Adicionar membro</h2>
 
         {opcoes.length > 1 && (
           <select
@@ -174,9 +301,9 @@ export function MembersAdminPage() {
           </button>
         </form>
 
-        {createError && <p className="mt-2 text-sm text-red-600">{createError}</p>}
-        {createFieldErrors && (
-          <p className="mt-2 text-sm text-red-600">{Object.values(createFieldErrors).flat().join(' ')}</p>
+        {createMembershipError && <p className="mt-2 text-sm text-red-600">{createMembershipError}</p>}
+        {createMembershipFieldErrors && (
+          <p className="mt-2 text-sm text-red-600">{Object.values(createMembershipFieldErrors).flat().join(' ')}</p>
         )}
 
         <div className="mt-3 space-y-2">
@@ -187,7 +314,7 @@ export function MembersAdminPage() {
               </span>
               <button
                 onClick={() => handleAtribuir(u.id)}
-                disabled={createStatus === 'loading' || !novoRole}
+                disabled={createMembershipStatus === 'loading' || !novoRole}
                 className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
                 Atribuir

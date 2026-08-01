@@ -56,8 +56,8 @@ export function AppLayout() {
             Pessoas
           </Link>
           {podeGerenciarMembros && (
-            <Link to="/membros" className="text-gray-600 hover:text-blue-600">
-              Gerenciar membros
+            <Link to="/gerenciamento" className="text-gray-600 hover:text-blue-600">
+              Gerenciamento
             </Link>
           )}
           {podeGerenciarMembros && (
