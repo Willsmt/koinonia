@@ -86,9 +86,18 @@ export function AppLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [lastPathname, setLastPathname] = useState(location.pathname)
   const profile = useAppSelector((state) => state.profile.data)
   const followStatus = useAppSelector((state) => state.follow.status)
   const { myMembership, membershipStatus } = useAppSelector((state) => state.church)
+
+  // fecha o drawer mobile ao trocar de rota — ajuste durante o render (não
+  // efeito), mesmo padrão já usado no ManagementPage pra evitar o
+  // react-hooks/set-state-in-effect
+  if (location.pathname !== lastPathname) {
+    setLastPathname(location.pathname)
+    setDrawerOpen(false)
+  }
 
   useEffect(() => {
     if (!profile) {
@@ -107,10 +116,6 @@ export function AppLayout() {
       dispatch(fetchMyMembership(profile.id))
     }
   }, [dispatch, profile, membershipStatus])
-
-  useEffect(() => {
-    setDrawerOpen(false)
-  }, [location.pathname])
 
   const podeGerenciarMembros =
     myMembership?.role === 'cell_leader' ||
