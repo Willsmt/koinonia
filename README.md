@@ -5,8 +5,10 @@
 
 Rede social para igrejas organizadas em células. Feed em três escopos (célula,
 rede, global) combinado com curtidas, comentários, follow, busca de pessoas,
-gestão de membros e um dashboard de estatísticas — tudo com visibilidade e
-permissões derivadas do papel de cada membro na estrutura da igreja.
+gestão de estrutura organizacional (redes, células e membros) e um dashboard
+de estatísticas — tudo com visibilidade e permissões derivadas do papel de
+cada membro na estrutura da igreja, e o nome de cada autor colorido pela cor
+da própria rede.
 
 ## Arquitetura
 
@@ -29,8 +31,10 @@ O controle de acesso do sistema deriva de uma única fonte: o `Membership`
   Tailwind CSS, react-hook-form + zod, Recharts
 - Testes: back-end via `manage.py test` (Django TestCase); front-end via
   Vitest + React Testing Library + MSW
-- Deploy (planejado, ciclo 9): API no Render + Postgres no Neon, front-end na
-  Vercel
+- Deploy: API no Render (https://koinonia-backend-r4u6.onrender.com) +
+  Postgres no Neon, front-end na Vercel (https://koinonia-delta.vercel.app).
+  CI/CD via GitHub Actions — build de imagem Docker + deploy por hook,
+  disparado só depois de lint+test+frontend passarem
 
 ## Setup (back-end)
 
@@ -109,7 +113,9 @@ Base: `/api/accounts/`
 Auth por token DRF: header `Authorization: Token <token>`.
 Exibição de nome: `nome_exibicao` usa o `apelido`; se vazio, cai no `nome`.
 `/users/` e `/users/{id}/` expõem só campos públicos (id, username,
-nome_exibicao, foto, bio, date_joined) — nunca email, telefone ou senha.
+nome_exibicao, cor, foto, bio, date_joined) — nunca email, telefone ou senha.
+`/me/` também expõe `cor`, pro próprio usuário ver o nome dele colorido no
+perfil.
 
 ### Validação de campos (accounts)
 
@@ -127,12 +133,22 @@ Base: `/api/church/` — todas as rotas exigem autenticação (Token).
 | Rota                      | Métodos                        | Quem escreve                                                       |
 | -------------------------- | --------------------------------- | ---------------------------------------------------------------------- |
 | `/api/church/redes/`      | GET, POST, PUT, PATCH, DELETE   | Pastor                                                                  |
-| `/api/church/celulas/`    | GET, POST, PUT, PATCH, DELETE   | Pastor, líder de rede                                                   |
+| `/api/church/celulas/`    | GET, POST, PUT, PATCH, DELETE   | Pastor, líder de rede (só da própria rede)                              |
 | `/api/church/memberships/`| GET, POST, PUT, PATCH, DELETE   | Líder de célula, líder de rede, pastor — cada um no próprio escopo    |
 | `/api/church/dashboard/`  | GET                              | Líder de célula, líder de rede, pastor — cada um no próprio escopo    |
 
 Leitura (GET) liberada para qualquer usuário autenticado, exceto
 `/dashboard/` (só liderança).
+
+**Cor da rede.** `Rede.cor` é um hex livre (`#rrggbb`, validado por regex) —
+não um enum fixo, então não há teto de quantas redes podem existir. Usada
+tanto como identidade visual quanto pra colorir o nome de quem pertence a
+ela (ver **Nome colorido** abaixo).
+
+**Segurança na exclusão.** Apagar uma Rede ou Célula que ainda tenha algo
+vinculado (célula, membro) é bloqueado (`400`, mensagem explicando o
+motivo) em vez de propagar erro cru — só `Post` é apagado em cascata junto
+com o escopo (célula/rede) que o continha.
 
 **Modelo de papéis.** Todo controle de acesso deriva de uma única fonte, o
 `Membership` (relação 1-para-1 com o usuário). O papel define o escopo de
@@ -166,6 +182,16 @@ escopo, posts nos últimos 14 dias e a célula mais ativa.
 
 **Bootstrap.** O superuser Django cria as redes/células pelo `/admin/` e
 promove o primeiro pastor criando um `Membership` com `role=pastor`.
+
+### Nome colorido
+
+Em todo lugar que exibe o nome de um autor (posts, comentários, busca de
+pessoas, perfil), o nome vem renderizado na cor do escopo de quem escreveu:
+a cor da rede (`Rede.cor`) pra quem tem Membership numa célula ou rede,
+dourado fixo pro pastor (sem escopo próprio), e cinza neutro pra quem não
+tem Membership. A API expõe isso como o campo `cor`/`author_cor`
+(accounts/posts/interactions); o front-end só aplica a cor recebida, sem
+tabela de mapeamento.
 
 ### Posts (postagens, escopos e feed)
 
@@ -211,7 +237,9 @@ feed de célula é só o dele.
 
 **Autoria.** `author` é sempre o usuário real, carimbado no servidor. Líder
 de célula pode assinar um post da própria célula via `posted_as` (a voz
-institucional da célula), sem perder o registro de quem escreveu.
+institucional da célula), sem perder o registro de quem escreveu. Post e
+comentário também expõem `author_cor` (ver **Nome colorido** na seção
+Church).
 
 ### Interactions (comentários, curtidas, follow e notificações)
 
