@@ -1,10 +1,27 @@
+import { useEffect } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
-import { useAppDispatch } from './hooks'
+import { useAppDispatch, useAppSelector } from './hooks'
 import { logout } from '../features/auth/authSlice'
+import { fetchMe } from '../features/auth/profileSlice'
+import { fetchMyFollowing } from '../features/interactions/followSlice'
 
 export function AppLayout() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const profile = useAppSelector((state) => state.profile.data)
+  const followStatus = useAppSelector((state) => state.follow.status)
+
+  useEffect(() => {
+    if (!profile) {
+      dispatch(fetchMe())
+    }
+  }, [dispatch, profile])
+
+  useEffect(() => {
+    if (followStatus === 'idle') {
+      dispatch(fetchMyFollowing())
+    }
+  }, [dispatch, followStatus])
 
   function handleLogout() {
     dispatch(logout())

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import client from '../../api/client'
+import { logout } from './authSlice'
 
 interface Profile {
   id: number
@@ -42,8 +43,6 @@ export const fetchMe = createAsyncThunk('profile/fetchMe', async (_: void, { rej
   }
 })
 
-// NÃO define Content-Type manualmente aqui — o axios detecta FormData e monta
-// o boundary do multipart sozinho. Setar o header à mão quebra o upload.
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
   async (formData: FormData, { rejectWithValue }) => {
@@ -94,6 +93,8 @@ const profileSlice = createSlice({
           state.updateError = 'Erro de conexão com o servidor.'
         }
       })
+      // limpa o perfil do usuário anterior — senão fica em cache até o F5
+      .addCase(logout, () => initialState)
   },
 })
 

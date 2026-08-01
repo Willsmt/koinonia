@@ -3,11 +3,8 @@ import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/auth/RegisterPage'
 import { ProfilePage } from '../features/auth/ProfilePage'
 import { ProtectedRoute } from '../features/auth/ProtectedRoute'
+import { FeedPage } from '../features/posts/FeedPage'
 import { AppLayout } from './AppLayout'
-
-function Home() {
-  return <div className="text-xl font-semibold">Bem-vindo(a) 👋</div>
-}
 
 export function AppRouter() {
   return (
@@ -17,7 +14,7 @@ export function AppRouter() {
         <Route path="/registro" element={<RegisterPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<FeedPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
           </Route>
         </Route>
