@@ -6,7 +6,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
-    autoDeploy: true
+    autoDeploy: false
     envVars:
       - key: SECRET_KEY
         sync: false
