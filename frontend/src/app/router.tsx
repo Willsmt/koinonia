@@ -7,6 +7,7 @@ import { FeedPage } from '../features/posts/FeedPage'
 import { PeoplePage } from '../features/people/PeoplePage'
 import { PublicProfilePage } from '../features/people/PublicProfilePage'
 import { MembersAdminPage } from '../features/church/MembersAdminPage'
+import { DashboardPage } from '../features/church/DashboardPage'
 import { BugReportsPage } from '../features/reports/BugReportsPage'
 import { PostDetailPage } from '../features/posts/PostDetailPage'
 import { AppLayout } from './AppLayout'
@@ -24,6 +25,7 @@ export function AppRouter() {
             <Route path="/pessoas" element={<PeoplePage />} />
             <Route path="/pessoas/:id" element={<PublicProfilePage />} />
             <Route path="/membros" element={<MembersAdminPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/relatos" element={<BugReportsPage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
           </Route>

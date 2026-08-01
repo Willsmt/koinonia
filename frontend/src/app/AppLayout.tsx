@@ -60,6 +60,11 @@ export function AppLayout() {
               Gerenciar membros
             </Link>
           )}
+          {podeGerenciarMembros && (
+            <Link to="/dashboard" className="text-gray-600 hover:text-blue-600">
+              Dashboard
+            </Link>
+          )}
           {ehPastor && (
             <Link to="/relatos" className="text-gray-600 hover:text-blue-600">
               Relatos

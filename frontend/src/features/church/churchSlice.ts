@@ -27,6 +27,15 @@ export interface Rede {
   cor_display: string
 }
 
+export interface DashboardStats {
+  escopo: 'cell_leader' | 'network_leader' | 'pastor'
+  total_membros: number
+  membros_por_celula: { nome: string; total: number; rede_nome: string }[]
+  posts_por_escopo: { global: number; rede: number; celula: number }
+  posts_por_dia: { data: string; total: number }[]
+  celula_mais_ativa: { nome: string; total: number } | null
+}
+
 interface ChurchState {
   myMembership: Membership | null
   membershipStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -39,6 +48,8 @@ interface ChurchState {
   createStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   createError: string | null
   createFieldErrors: Record<string, string[]> | null
+  dashboard: DashboardStats | null
+  dashboardStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
 const initialState: ChurchState = {
@@ -53,6 +64,8 @@ const initialState: ChurchState = {
   createStatus: 'idle',
   createError: null,
   createFieldErrors: null,
+  dashboard: null,
+  dashboardStatus: 'idle',
 }
 
 function extractList<T>(data: T[] | { results: T[] }): T[] {
@@ -78,6 +91,11 @@ export const fetchRedes = createAsyncThunk('church/fetchRedes', async () => {
 export const fetchAllMemberships = createAsyncThunk('church/fetchAllMemberships', async () => {
   const { data } = await client.get('/church/memberships/')
   return extractList<Membership>(data)
+})
+
+export const fetchDashboardStats = createAsyncThunk('church/fetchDashboardStats', async () => {
+  const { data } = await client.get<DashboardStats>('/church/dashboard/')
+  return data
 })
 
 export const createMembership = createAsyncThunk(
@@ -151,6 +169,16 @@ const churchSlice = createSlice({
       })
       .addCase(fetchAllMemberships.rejected, (state) => {
         state.allMembershipsStatus = 'failed'
+      })
+      .addCase(fetchDashboardStats.pending, (state) => {
+        state.dashboardStatus = 'loading'
+      })
+      .addCase(fetchDashboardStats.fulfilled, (state, action) => {
+        state.dashboardStatus = 'succeeded'
+        state.dashboard = action.payload
+      })
+      .addCase(fetchDashboardStats.rejected, (state) => {
+        state.dashboardStatus = 'failed'
       })
       .addCase(createMembership.pending, (state) => {
         state.createStatus = 'loading'
