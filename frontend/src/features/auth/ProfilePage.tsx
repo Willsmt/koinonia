@@ -141,7 +141,7 @@ export function ProfilePage() {
           <label htmlFor="foto" className="block text-sm font-medium text-gray-700">
             Foto
           </label>
-          <input id="foto" type="file" accept="image/*" onChange={handleFotoChange} className="mt-1 text-sm" />
+          <input id="foto" type="file" accept="image/*" onChange={handleFotoChange} className="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100" />
         </div>
 
         <div>

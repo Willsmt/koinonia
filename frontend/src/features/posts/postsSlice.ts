@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import client from '../../api/client'
 import { logout } from '../auth/authSlice'
+import { toggleFollow } from '../interactions/followSlice'
 
 export interface Post {
   id: number
@@ -11,6 +12,7 @@ export interface Post {
   rede: number | null
   posted_as: number | null
   conteudo: string
+  imagem: string | null
   created_at: string
 }
 
@@ -74,35 +76,48 @@ export const fetchFeed = createAsyncThunk(
   },
 )
 
+interface PageResponse {
+  results: Post[]
+  next: string | null
+}
+
 export const fetchAllReadable = createAsyncThunk('posts/fetchAllReadable', async (_: void, { rejectWithValue }) => {
   try {
-    const { data } = await client.get<{ results: Post[] }>('/posts/')
-    return data.results
+    let url: string | null = '/posts/'
+    let all: Post[] = []
+    while (url) {
+      const { data }: { data: PageResponse } = await client.get(url)
+      all = all.concat(data.results)
+      url = data.next
+    }
+    return all
   } catch (err) {
     const axiosErr = err as { response?: { data?: unknown } }
     return rejectWithValue(axiosErr.response?.data)
   }
 })
 
-interface CreatePostPayload {
-  escopo: FeedName
-  conteudo: string
-  celula?: number
-  rede?: number
-}
+// Sempre multipart — uniforme independente de ter imagem anexada ou não
+// (mesma decisão já tomada no update de perfil).
+export const createPost = createAsyncThunk('posts/createPost', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const { data } = await client.post('/posts/', formData)
+    return data as Post
+  } catch (err) {
+    const axiosErr = err as { response?: { data?: unknown } }
+    return rejectWithValue(axiosErr.response?.data)
+  }
+})
 
-export const createPost = createAsyncThunk(
-  'posts/createPost',
-  async (payload: CreatePostPayload, { rejectWithValue }) => {
-    try {
-      const { data } = await client.post('/posts/', payload)
-      return data as Post
-    } catch (err) {
-      const axiosErr = err as { response?: { data?: unknown } }
-      return rejectWithValue(axiosErr.response?.data)
-    }
-  },
-)
+export const deletePost = createAsyncThunk('posts/deletePost', async (postId: number, { rejectWithValue }) => {
+  try {
+    await client.delete(`/posts/${postId}/`)
+    return postId
+  } catch (err) {
+    const axiosErr = err as { response?: { data?: unknown } }
+    return rejectWithValue(axiosErr.response?.data)
+  }
+})
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -156,6 +171,16 @@ const postsSlice = createSlice({
         } else {
           state.createError = 'Erro de conexão com o servidor.'
         }
+      })
+      .addCase(toggleFollow.fulfilled, (state) => {
+        state.feeds.global.status = 'idle'
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        const id = action.payload
+        state.feeds.global.items = state.feeds.global.items.filter((p) => p.id !== id)
+        state.feeds.celula.items = state.feeds.celula.items.filter((p) => p.id !== id)
+        state.feeds.rede.items = state.feeds.rede.items.filter((p) => p.id !== id)
+        state.allReadable.items = state.allReadable.items.filter((p) => p.id !== id)
       })
       .addCase(logout, () => initialState)
   },

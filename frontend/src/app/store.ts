@@ -6,6 +6,7 @@ import churchReducer from '../features/church/churchSlice'
 import likesReducer from '../features/interactions/likesSlice'
 import commentsReducer from '../features/interactions/commentsSlice'
 import followReducer from '../features/interactions/followSlice'
+import peopleReducer from '../features/people/peopleSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     likes: likesReducer,
     comments: commentsReducer,
     follow: followReducer,
+    people: peopleReducer,
   },
 })
 

@@ -4,6 +4,9 @@ import { RegisterPage } from '../features/auth/RegisterPage'
 import { ProfilePage } from '../features/auth/ProfilePage'
 import { ProtectedRoute } from '../features/auth/ProtectedRoute'
 import { FeedPage } from '../features/posts/FeedPage'
+import { PeoplePage } from '../features/people/PeoplePage'
+import { PublicProfilePage } from '../features/people/PublicProfilePage'
+import { MembersAdminPage } from '../features/church/MembersAdminPage'
 import { AppLayout } from './AppLayout'
 
 export function AppRouter() {
@@ -16,6 +19,9 @@ export function AppRouter() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<FeedPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="/pessoas" element={<PeoplePage />} />
+            <Route path="/pessoas/:id" element={<PublicProfilePage />} />
+            <Route path="/membros" element={<MembersAdminPage />} />
           </Route>
         </Route>
       </Routes>

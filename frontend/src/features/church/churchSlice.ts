@@ -34,6 +34,11 @@ interface ChurchState {
   celulasStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   redes: Rede[]
   redesStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  allMemberships: Membership[]
+  allMembershipsStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  createStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  createError: string | null
+  createFieldErrors: Record<string, string[]> | null
 }
 
 const initialState: ChurchState = {
@@ -43,6 +48,11 @@ const initialState: ChurchState = {
   celulasStatus: 'idle',
   redes: [],
   redesStatus: 'idle',
+  allMemberships: [],
+  allMembershipsStatus: 'idle',
+  createStatus: 'idle',
+  createError: null,
+  createFieldErrors: null,
 }
 
 function extractList<T>(data: T[] | { results: T[] }): T[] {
@@ -64,6 +74,37 @@ export const fetchRedes = createAsyncThunk('church/fetchRedes', async () => {
   const { data } = await client.get('/church/redes/')
   return extractList<Rede>(data)
 })
+
+export const fetchAllMemberships = createAsyncThunk('church/fetchAllMemberships', async () => {
+  const { data } = await client.get('/church/memberships/')
+  return extractList<Membership>(data)
+})
+
+export const createMembership = createAsyncThunk(
+  'church/createMembership',
+  async (payload: { user: number; role: string; celula?: number; rede?: number }, { rejectWithValue }) => {
+    try {
+      const { data } = await client.post('/church/memberships/', payload)
+      return data as Membership
+    } catch (err) {
+      const axiosErr = err as { response?: { data?: unknown } }
+      return rejectWithValue(axiosErr.response?.data)
+    }
+  },
+)
+
+export const deleteMembership = createAsyncThunk(
+  'church/deleteMembership',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await client.delete(`/church/memberships/${id}/`)
+      return id
+    } catch (err) {
+      const axiosErr = err as { response?: { data?: unknown } }
+      return rejectWithValue(axiosErr.response?.data)
+    }
+  },
+)
 
 const churchSlice = createSlice({
   name: 'church',
@@ -101,7 +142,38 @@ const churchSlice = createSlice({
       .addCase(fetchRedes.rejected, (state) => {
         state.redesStatus = 'failed'
       })
-      // a Membership é por usuário — troca de conta sem isso mantinha o role antigo
+      .addCase(fetchAllMemberships.pending, (state) => {
+        state.allMembershipsStatus = 'loading'
+      })
+      .addCase(fetchAllMemberships.fulfilled, (state, action) => {
+        state.allMembershipsStatus = 'succeeded'
+        state.allMemberships = action.payload
+      })
+      .addCase(fetchAllMemberships.rejected, (state) => {
+        state.allMembershipsStatus = 'failed'
+      })
+      .addCase(createMembership.pending, (state) => {
+        state.createStatus = 'loading'
+        state.createError = null
+        state.createFieldErrors = null
+      })
+      .addCase(createMembership.fulfilled, (state, action) => {
+        state.createStatus = 'succeeded'
+        state.allMemberships = [...state.allMemberships, action.payload]
+      })
+      .addCase(createMembership.rejected, (state, action) => {
+        state.createStatus = 'failed'
+        const payload = action.payload
+        if (payload && typeof payload === 'object') {
+          state.createFieldErrors = payload as Record<string, string[]>
+          state.createError = 'Não foi possível atribuir.'
+        } else {
+          state.createError = 'Erro de conexão com o servidor.'
+        }
+      })
+      .addCase(deleteMembership.fulfilled, (state, action) => {
+        state.allMemberships = state.allMemberships.filter((m) => m.id !== action.payload)
+      })
       .addCase(logout, () => initialState)
   },
 })
