@@ -1,9 +1,10 @@
 from datetime import timedelta
 
 from django.db.models import Count, F, Q
+from django.db.models.deletion import ProtectedError
 from django.db.models.functions import TruncDate
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,11 +20,39 @@ class RedeViewSet(viewsets.ModelViewSet):
     serializer_class = RedeSerializer
     permission_classes = [IsPastor]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {
+                    "detail": (
+                        "Não é possível excluir: ainda existem células "
+                        "vinculadas a esta rede."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 class CelulaViewSet(viewsets.ModelViewSet):
     queryset = Celula.objects.select_related("rede")
     serializer_class = CelulaSerializer
     permission_classes = [CanManageCelula]
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {
+                    "detail": (
+                        "Não é possível excluir: ainda existem membros "
+                        "vinculados a esta célula."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class MembershipViewSet(viewsets.ModelViewSet):

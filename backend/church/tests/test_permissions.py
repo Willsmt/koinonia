@@ -57,6 +57,49 @@ class RedePermissionTest(APITestCase):
         r = self.client.get("/api/church/redes/")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
+    def test_lider_rede_deleta_celula_da_propria_rede(self):
+        nova = Celula.objects.create(nome="Sem membros", rede=self.rede)
+        self.client.force_authenticate(self.lider_rede)
+        r = self.client.delete(f"/api/church/celulas/{nova.id}/")
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_lider_rede_nao_deleta_celula_de_outra_rede(self):
+        nova = Celula.objects.create(nome="Sem membros", rede=self.rede2)
+        self.client.force_authenticate(self.lider_rede)
+        r = self.client.delete(f"/api/church/celulas/{nova.id}/")
+        self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_pastor_deleta_celula_de_qualquer_rede(self):
+        nova = Celula.objects.create(nome="Sem membros", rede=self.rede2)
+        self.client.force_authenticate(self.pastor)
+        r = self.client.delete(f"/api/church/celulas/{nova.id}/")
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_lider_rede_nao_cria_celula_em_outra_rede(self):
+        self.client.force_authenticate(self.lider_rede)
+        r = self.client.post(
+            "/api/church/celulas/", {"nome": "Intrusa", "rede": self.rede2.id}
+        )
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_deletar_celula_com_membro_da_erro_amigavel(self):
+        self.client.force_authenticate(self.pastor)
+        r = self.client.delete(f"/api/church/celulas/{self.celula.id}/")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", r.data)
+
+    def test_deletar_rede_com_celula_da_erro_amigavel(self):
+        self.client.force_authenticate(self.pastor)
+        r = self.client.delete(f"/api/church/redes/{self.rede.id}/")
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", r.data)
+
+    def test_deletar_rede_vazia_funciona(self):
+        vazia = Rede.objects.create(nome="Vazia", cor="#000000")
+        self.client.force_authenticate(self.pastor)
+        r = self.client.delete(f"/api/church/redes/{vazia.id}/")
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_lider_celula_adiciona_membership(self):
         self.client.force_authenticate(self.lider_celula)
         novo = User.objects.create_user(

@@ -31,6 +31,16 @@ class CanManageCelula(permissions.BasePermission):
             Membership.Role.NETWORK_LEADER,
         }
 
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        role = _role(request.user)
+        if role == Membership.Role.PASTOR:
+            return True
+        if role == Membership.Role.NETWORK_LEADER:
+            return obj.rede_id == request.user.membership.rede_id
+        return False
+
 
 class CanManageMembership(permissions.BasePermission):
     """Líder de célula, líder de rede e pastor escrevem; leitura para autenticado.
