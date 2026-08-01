@@ -80,6 +80,10 @@ export const handlers = [
     return HttpResponse.json({ count: 0, next: null, previous: null, results: [] })
   }),
 
+  http.get(`${API}/interactions/notifications/`, () => {
+    return HttpResponse.json({ count: 0, next: null, previous: null, results: [] })
+  }),
+
   http.post(`${API}/posts/`, async ({ request }) => {
     const body = (await request.json()) as Record<string, unknown>
     return HttpResponse.json(

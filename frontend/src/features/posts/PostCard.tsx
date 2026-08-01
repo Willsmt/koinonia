@@ -5,6 +5,7 @@ import type { Post } from './postsSlice'
 import { fetchLikes, toggleLike } from '../interactions/likesSlice'
 import { fetchComments, createComment } from '../interactions/commentsSlice'
 import { deletePost } from './postsSlice'
+import { Avatar } from '../../components/Avatar'
 import { FollowButton } from '../interactions/FollowButton'
 
 const ESCOPO_LABELS: Record<Post['escopo'], string> = {
@@ -20,6 +21,7 @@ export function PostCard({ post }: { post: Post }) {
   const commentsInfo = useAppSelector((state) => state.comments.byPost[post.id])
   const [showComments, setShowComments] = useState(false)
   const [novoComentario, setNovoComentario] = useState('')
+  const [imagemAmpliada, setImagemAmpliada] = useState(false)
 
   useEffect(() => {
     if (myId && !likeInfo) {
@@ -43,6 +45,9 @@ export function PostCard({ post }: { post: Post }) {
     <article className="rounded-lg bg-white p-4 shadow">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
+          <Link to={`/pessoas/${post.author}`}>
+            <Avatar src={post.author_foto} size="h-9 w-9" />
+          </Link>
           <Link to={`/pessoas/${post.author}`} className="font-medium hover:underline">
             {post.author_nome}
           </Link>
@@ -70,7 +75,20 @@ export function PostCard({ post }: { post: Post }) {
 
       {post.conteudo && <p className="mt-2 whitespace-pre-wrap break-words text-gray-800">{post.conteudo}</p>}
       {post.imagem && (
-        <img src={post.imagem} alt="" className="mt-2 max-h-96 w-full rounded-lg object-cover" />
+        <img
+          src={post.imagem}
+          alt=""
+          onClick={() => setImagemAmpliada(true)}
+          className="mt-2 max-h-96 w-full cursor-zoom-in rounded-lg object-cover"
+        />
+      )}
+      {post.imagem && imagemAmpliada && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setImagemAmpliada(false)}
+        >
+          <img src={post.imagem} alt="" className="max-h-[80vh] max-w-[90vw] rounded-lg object-contain" />
+        </div>
       )}
       <p className="mt-2 text-xs text-gray-400">{new Date(post.created_at).toLocaleString('pt-BR')}</p>
 

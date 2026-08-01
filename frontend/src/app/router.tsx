@@ -8,6 +8,7 @@ import { PeoplePage } from '../features/people/PeoplePage'
 import { PublicProfilePage } from '../features/people/PublicProfilePage'
 import { MembersAdminPage } from '../features/church/MembersAdminPage'
 import { BugReportsPage } from '../features/reports/BugReportsPage'
+import { PostDetailPage } from '../features/posts/PostDetailPage'
 import { AppLayout } from './AppLayout'
 
 export function AppRouter() {
@@ -24,6 +25,7 @@ export function AppRouter() {
             <Route path="/pessoas/:id" element={<PublicProfilePage />} />
             <Route path="/membros" element={<MembersAdminPage />} />
             <Route path="/relatos" element={<BugReportsPage />} />
+            <Route path="/posts/:id" element={<PostDetailPage />} />
           </Route>
         </Route>
       </Routes>

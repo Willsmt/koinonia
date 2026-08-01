@@ -6,6 +6,7 @@ import { fetchMe } from '../features/auth/profileSlice'
 import { fetchMyFollowing } from '../features/interactions/followSlice'
 import { fetchMyMembership } from '../features/church/churchSlice'
 import { BugReportButton } from '../features/reports/BugReportButton'
+import { NotificationBell } from '../features/notifications/NotificationBell'
 
 export function AppLayout() {
   const dispatch = useAppDispatch()
@@ -50,6 +51,7 @@ export function AppLayout() {
           koinonia
         </Link>
         <nav className="flex items-center gap-4 text-sm">
+          <NotificationBell />
           <Link to="/pessoas" className="text-gray-600 hover:text-blue-600">
             Pessoas
           </Link>

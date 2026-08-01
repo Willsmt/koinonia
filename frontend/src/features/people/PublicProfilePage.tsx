@@ -5,6 +5,7 @@ import { fetchUserDetail } from './peopleSlice'
 import { fetchAllReadable } from '../posts/postsSlice'
 import { PostCard } from '../posts/PostCard'
 import { FollowButton } from '../interactions/FollowButton'
+import { Avatar } from '../../components/Avatar'
 
 export function PublicProfilePage() {
   const { id } = useParams<{ id: string }>()
@@ -35,11 +36,7 @@ export function PublicProfilePage() {
     <div className="mx-auto max-w-lg space-y-4">
       <div className="rounded-lg bg-white p-6 shadow">
         <div className="flex items-center gap-4">
-          {viewedUser.foto ? (
-            <img src={viewedUser.foto} alt="" className="h-16 w-16 rounded-full object-cover" />
-          ) : (
-            <div className="h-16 w-16 rounded-full bg-gray-200" />
-          )}
+          <Avatar src={viewedUser.foto} size="h-16 w-16" zoomable />
           <div className="flex-1">
             <p className="text-lg font-semibold">{viewedUser.nome_exibicao}</p>
             <p className="text-sm text-gray-500">@{viewedUser.username}</p>

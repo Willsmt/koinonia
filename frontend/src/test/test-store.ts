@@ -8,6 +8,7 @@ import commentsReducer from '../features/interactions/commentsSlice'
 import followReducer from '../features/interactions/followSlice'
 import peopleReducer from '../features/people/peopleSlice'
 import reportsReducer from '../features/reports/reportsSlice'
+import notificationsReducer from '../features/notifications/notificationsSlice'
 
 export function createTestStore() {
   return configureStore({
@@ -21,6 +22,7 @@ export function createTestStore() {
       follow: followReducer,
       people: peopleReducer,
       reports: reportsReducer,
+      notifications: notificationsReducer,
     },
   })
 }

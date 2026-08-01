@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { searchUsers } from './peopleSlice'
 import { FollowButton } from '../interactions/FollowButton'
+import { Avatar } from '../../components/Avatar'
 
 export function PeoplePage() {
   const dispatch = useAppDispatch()
@@ -42,11 +43,7 @@ export function PeoplePage() {
         {results.map((user) => (
           <div key={user.id} className="flex items-center justify-between rounded-lg bg-white p-3 shadow">
             <Link to={`/pessoas/${user.id}`} className="flex items-center gap-3">
-              {user.foto ? (
-                <img src={user.foto} alt="" className="h-10 w-10 rounded-full object-cover" />
-              ) : (
-                <div className="h-10 w-10 rounded-full bg-gray-200" />
-              )}
+              <Avatar src={user.foto} size="h-10 w-10" />
               <div>
                 <p className="font-medium hover:underline">{user.nome_exibicao}</p>
                 <p className="text-xs text-gray-500">@{user.username}</p>

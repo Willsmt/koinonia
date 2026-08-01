@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchMe, updateProfile } from './profileSlice'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter'
+import { Avatar } from '../../components/Avatar'
 
 function telefoneMask(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 11)
@@ -116,15 +117,7 @@ export function ProfilePage() {
     <div className="max-w-lg space-y-6">
       <div className="rounded-lg bg-white p-6 shadow">
         <div className="flex items-center gap-4">
-          {fotoPreview || data.foto ? (
-            <img
-              src={fotoPreview ?? data.foto ?? ''}
-              alt=""
-              className="h-16 w-16 rounded-full bg-gray-200 object-cover"
-            />
-          ) : (
-            <div className="h-16 w-16 rounded-full bg-gray-200" />
-          )}
+          <Avatar src={fotoPreview ?? data.foto} size="h-16 w-16" zoomable />
           <div>
             <p className="font-semibold">{data.nome_exibicao || data.username}</p>
             <p className="text-sm text-gray-500">

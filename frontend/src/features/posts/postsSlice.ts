@@ -7,6 +7,7 @@ export interface Post {
   id: number
   author: number
   author_nome: string
+  author_foto: string | null
   escopo: 'celula' | 'rede' | 'global'
   celula: number | null
   rede: number | null
@@ -34,6 +35,8 @@ interface ListState {
 interface PostsState {
   feeds: Record<FeedName, FeedState>
   allReadable: ListState
+  viewedPost: Post | null
+  viewedPostStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   createStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   createError: string | null
   createFieldErrors: Record<string, string[]> | null
@@ -46,6 +49,8 @@ function emptyFeed(): FeedState {
 const initialState: PostsState = {
   feeds: { global: emptyFeed(), celula: emptyFeed(), rede: emptyFeed() },
   allReadable: { items: [], status: 'idle', error: null },
+  viewedPost: null,
+  viewedPostStatus: 'idle',
   createStatus: 'idle',
   createError: null,
   createFieldErrors: null,
@@ -80,6 +85,16 @@ interface PageResponse {
   results: Post[]
   next: string | null
 }
+
+export const fetchPostById = createAsyncThunk('posts/fetchPostById', async (id: number, { rejectWithValue }) => {
+  try {
+    const { data } = await client.get<Post>(`/posts/${id}/`)
+    return data
+  } catch (err) {
+    const axiosErr = err as { response?: { data?: unknown } }
+    return rejectWithValue(axiosErr.response?.data)
+  }
+})
 
 export const fetchAllReadable = createAsyncThunk('posts/fetchAllReadable', async (_: void, { rejectWithValue }) => {
   try {
@@ -171,6 +186,17 @@ const postsSlice = createSlice({
         } else {
           state.createError = 'Erro de conexão com o servidor.'
         }
+      })
+      .addCase(fetchPostById.pending, (state) => {
+        state.viewedPostStatus = 'loading'
+        state.viewedPost = null
+      })
+      .addCase(fetchPostById.fulfilled, (state, action) => {
+        state.viewedPostStatus = 'succeeded'
+        state.viewedPost = action.payload
+      })
+      .addCase(fetchPostById.rejected, (state) => {
+        state.viewedPostStatus = 'failed'
       })
       .addCase(toggleFollow.fulfilled, (state) => {
         state.feeds.global.status = 'idle'
