@@ -25,7 +25,7 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "author", "created_at"]
 
     def validate_imagem(self, value):
-        limite = 5 * 1024 * 1024  # 5MB
+        limite = 2 * 1024 * 1024  # 2MB
         if value and value.size > limite:
             raise serializers.ValidationError("Imagem maior que 5MB.")
         return value

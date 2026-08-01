@@ -38,7 +38,7 @@ class Post(models.Model):
         blank=True,
         related_name="posts",
     )
-    conteudo = models.TextField(blank=True)
+    conteudo = models.TextField(blank=True, max_length=3000)
     imagem = models.ImageField(upload_to="posts/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
