@@ -59,7 +59,13 @@ class CanManageMembership(permissions.BasePermission):
             return True
         if role == Membership.Role.NETWORK_LEADER:
             rede_do_alvo = obj.rede_efetiva
-            return rede_do_alvo is not None and rede_do_alvo.id == request.user.membership.rede_id
+            return (
+                rede_do_alvo is not None
+                and rede_do_alvo.id == request.user.membership.rede_id
+            )
         if role == Membership.Role.CELL_LEADER:
-            return obj.celula_id == request.user.membership.celula_id and obj.role == Membership.Role.MEMBER
+            return (
+                obj.celula_id == request.user.membership.celula_id
+                and obj.role == Membership.Role.MEMBER
+            )
         return False

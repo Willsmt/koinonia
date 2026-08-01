@@ -66,10 +66,16 @@ class UserDetailTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.wills = User.objects.create_user(
-            username="wills", email="wills@ex.com", password="senha-forte-123", nome="Willians Martins"
+            username="wills",
+            email="wills@ex.com",
+            password="senha-forte-123",
+            nome="Willians Martins",
         )
         cls.patricia = User.objects.create_user(
-            username="patty", email="patty@ex.com", password="senha-forte-123", nome="Patricia Almeida"
+            username="patty",
+            email="patty@ex.com",
+            password="senha-forte-123",
+            nome="Patricia Almeida",
         )
 
     def test_anonimo_nao_acessa_detail(self):

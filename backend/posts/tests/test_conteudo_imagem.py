@@ -40,7 +40,9 @@ class ConteudoELimitesTests(PostsBaseTestCase):
 
     def test_so_imagem_sem_texto_passa(self):
         imagem = _imagem(10, 10)
-        resp = self._postar(self.solto, {"escopo": "global", "imagem": imagem}, format="multipart")
+        resp = self._postar(
+            self.solto, {"escopo": "global", "imagem": imagem}, format="multipart"
+        )
         self.assertEqual(resp.status_code, 201)
 
     def test_imagem_ate_2mb_passa(self):

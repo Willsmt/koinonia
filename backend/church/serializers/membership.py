@@ -79,7 +79,9 @@ class MembershipSerializer(serializers.ModelSerializer):
 
         if ator is not None and ator.role == Membership.Role.NETWORK_LEADER:
             if role_alvo not in {Membership.Role.MEMBER, Membership.Role.CELL_LEADER}:
-                raise PermissionDenied("Líder de rede só atribui member ou cell_leader.")
+                raise PermissionDenied(
+                    "Líder de rede só atribui member ou cell_leader."
+                )
             if celula_alvo is None or celula_alvo.rede_id != ator.rede_id:
                 raise PermissionDenied("Você só gerencia membros da sua própria rede.")
             return
@@ -88,7 +90,9 @@ class MembershipSerializer(serializers.ModelSerializer):
             if role_alvo != Membership.Role.MEMBER:
                 raise PermissionDenied("Líder de célula só atribui member.")
             if celula_alvo is None or celula_alvo.id != ator.celula_id:
-                raise PermissionDenied("Você só gerencia membros da sua própria célula.")
+                raise PermissionDenied(
+                    "Você só gerencia membros da sua própria célula."
+                )
             return
 
         raise PermissionDenied("Seu papel não gerencia memberships.")
