@@ -1,1 +1,67 @@
 @import "tailwindcss";
+
+@theme {
+  /* Fontes */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Rajdhani", var(--font-sans);
+  --font-wordmark: "Cinzel", serif;
+
+  /* Marca */
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #7c3aed;
+  --color-primary-ring: #a78bfa;
+  --color-primary-tint: rgba(139, 92, 246, 0.14);
+
+  --color-danger: #f43f5e;
+  --color-danger-hover: #e11d48;
+  --color-danger-tint: rgba(244, 63, 94, 0.14);
+  --color-like: #f43f5e;
+
+  --color-success: #34d399;
+
+  /* Superfícies */
+  --color-canvas: #08070d;
+  --color-surface: #131019;
+  --color-surface-sunken: #0d0b13;
+  --color-surface-muted: #1d1927;
+
+  /* Texto (namespace "ink" pra não duplicar o prefixo text-) */
+  --color-ink-strong: #f1eefb;
+  --color-ink-default: #d7d1e8;
+  --color-ink-muted: #a89fc4;
+  --color-ink-subtle: #8a80ab;
+  --color-ink-faint: #5f5680;
+  --color-ink-on-accent: #ffffff;
+
+  /* Bordas */
+  --color-border: #262038;
+  --color-border-input: #322a49;
+
+  /* Gráficos */
+  --color-chart-1: #8b5cf6;
+  --color-chart-2: #f43f5e;
+  --color-chart-3: #34d399;
+
+  /* Overlays */
+  --color-overlay: rgb(0 0 0 / 0.8);
+  --color-overlay-soft: rgb(0 0 0 / 0.4);
+
+  /* Sombra com halo roxo (nome próprio, não sobrescreve shadow/shadow-sm padrão) */
+  --shadow-halo: 0 0 0 1px rgba(139, 92, 246, 0.16), 0 20px 44px -18px rgba(0, 0, 0, 0.6);
+  --shadow-halo-sm: 0 0 0 1px rgba(139, 92, 246, 0.14);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(139, 92, 246, 0.12), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(244, 63, 94, 0.10), transparent 40%);
+  background-attachment: fixed;
+  color: var(--color-ink-default);
+  font-family: var(--font-sans);
+}
