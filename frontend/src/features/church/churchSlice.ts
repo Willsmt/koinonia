@@ -53,6 +53,9 @@ interface ChurchState {
   createCelulaStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
   createCelulaError: string | null
   createCelulaFieldErrors: Record<string, string[]> | null
+  deleteMembershipError: string | null
+  deleteRedeError: string | null
+  deleteCelulaError: string | null
   dashboard: DashboardStats | null
   dashboardStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
@@ -75,12 +78,20 @@ const initialState: ChurchState = {
   createCelulaStatus: 'idle',
   createCelulaError: null,
   createCelulaFieldErrors: null,
+  deleteMembershipError: null,
+  deleteRedeError: null,
+  deleteCelulaError: null,
   dashboard: null,
   dashboardStatus: 'idle',
 }
 
 function extractList<T>(data: T[] | { results: T[] }): T[] {
   return Array.isArray(data) ? data : data.results
+}
+
+function extractDetail(err: unknown): string {
+  const axiosErr = err as { response?: { data?: { detail?: string } } }
+  return axiosErr.response?.data?.detail ?? 'Erro de conexão com o servidor.'
 }
 
 export const fetchMyMembership = createAsyncThunk('church/fetchMyMembership', async (userId: number) => {
@@ -129,8 +140,7 @@ export const deleteMembership = createAsyncThunk(
       await client.delete(`/church/memberships/${id}/`)
       return id
     } catch (err) {
-      const axiosErr = err as { response?: { data?: unknown } }
-      return rejectWithValue(axiosErr.response?.data)
+      return rejectWithValue(extractDetail(err))
     }
   },
 )
@@ -148,6 +158,15 @@ export const createRede = createAsyncThunk(
   },
 )
 
+export const deleteRede = createAsyncThunk('church/deleteRede', async (id: number, { rejectWithValue }) => {
+  try {
+    await client.delete(`/church/redes/${id}/`)
+    return id
+  } catch (err) {
+    return rejectWithValue(extractDetail(err))
+  }
+})
+
 export const createCelula = createAsyncThunk(
   'church/createCelula',
   async (payload: { nome: string; rede: number }, { rejectWithValue }) => {
@@ -160,6 +179,15 @@ export const createCelula = createAsyncThunk(
     }
   },
 )
+
+export const deleteCelula = createAsyncThunk('church/deleteCelula', async (id: number, { rejectWithValue }) => {
+  try {
+    await client.delete(`/church/celulas/${id}/`)
+    return id
+  } catch (err) {
+    return rejectWithValue(extractDetail(err))
+  }
+})
 
 const churchSlice = createSlice({
   name: 'church',
@@ -236,8 +264,14 @@ const churchSlice = createSlice({
           state.createMembershipError = 'Erro de conexão com o servidor.'
         }
       })
+      .addCase(deleteMembership.pending, (state) => {
+        state.deleteMembershipError = null
+      })
       .addCase(deleteMembership.fulfilled, (state, action) => {
         state.allMemberships = state.allMemberships.filter((m) => m.id !== action.payload)
+      })
+      .addCase(deleteMembership.rejected, (state, action) => {
+        state.deleteMembershipError = action.payload as string
       })
       .addCase(createRede.pending, (state) => {
         state.createRedeStatus = 'loading'
@@ -258,6 +292,15 @@ const churchSlice = createSlice({
           state.createRedeError = 'Erro de conexão com o servidor.'
         }
       })
+      .addCase(deleteRede.pending, (state) => {
+        state.deleteRedeError = null
+      })
+      .addCase(deleteRede.fulfilled, (state, action) => {
+        state.redes = state.redes.filter((r) => r.id !== action.payload)
+      })
+      .addCase(deleteRede.rejected, (state, action) => {
+        state.deleteRedeError = action.payload as string
+      })
       .addCase(createCelula.pending, (state) => {
         state.createCelulaStatus = 'loading'
         state.createCelulaError = null
@@ -276,6 +319,15 @@ const churchSlice = createSlice({
         } else {
           state.createCelulaError = 'Erro de conexão com o servidor.'
         }
+      })
+      .addCase(deleteCelula.pending, (state) => {
+        state.deleteCelulaError = null
+      })
+      .addCase(deleteCelula.fulfilled, (state, action) => {
+        state.celulas = state.celulas.filter((c) => c.id !== action.payload)
+      })
+      .addCase(deleteCelula.rejected, (state, action) => {
+        state.deleteCelulaError = action.payload as string
       })
       .addCase(logout, () => initialState)
   },

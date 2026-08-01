@@ -8,7 +8,9 @@ import {
   createMembership,
   deleteMembership,
   createRede,
+  deleteRede,
   createCelula,
+  deleteCelula,
 } from './churchSlice'
 import { searchUsers } from '../people/peopleSlice'
 import { NomeColorido } from '../../components/NomeColorido'
@@ -45,6 +47,9 @@ export function ManagementPage() {
     createCelulaStatus,
     createCelulaError,
     createCelulaFieldErrors,
+    deleteMembershipError,
+    deleteRedeError,
+    deleteCelulaError,
   } = useAppSelector((state) => state.church)
   const { results: searchResults } = useAppSelector((state) => state.people)
 
@@ -141,7 +146,7 @@ export function ManagementPage() {
 
       {role === 'pastor' && (
         <div className="rounded-lg bg-white p-4 shadow">
-          <h2 className="mb-3 text-lg font-semibold">Criar rede</h2>
+          <h2 className="mb-3 text-lg font-semibold">Redes</h2>
           <form onSubmit={handleCriarRede} className="flex items-end gap-2">
             <div className="flex-1">
               <label htmlFor="nome-rede" className="block text-sm font-medium text-gray-700">
@@ -179,12 +184,28 @@ export function ManagementPage() {
           {createRedeFieldErrors && (
             <p className="mt-2 text-sm text-red-600">{Object.values(createRedeFieldErrors).flat().join(' ')}</p>
           )}
+
+          <div className="mt-3 space-y-2">
+            {redes.map((r) => (
+              <div key={r.id} className="flex items-center justify-between rounded border border-gray-200 p-2 text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full border border-gray-300" style={{ backgroundColor: r.cor }} />
+                  {r.nome}
+                </span>
+                <button onClick={() => dispatch(deleteRede(r.id))} className="text-xs text-red-600 hover:underline">
+                  Remover
+                </button>
+              </div>
+            ))}
+            {redes.length === 0 && <p className="text-sm text-gray-500">Nenhuma rede ainda.</p>}
+          </div>
+          {deleteRedeError && <p className="mt-2 text-sm text-red-600">{deleteRedeError}</p>}
         </div>
       )}
 
       {(role === 'pastor' || role === 'network_leader') && (
         <div className="rounded-lg bg-white p-4 shadow">
-          <h2 className="mb-3 text-lg font-semibold">Criar célula</h2>
+          <h2 className="mb-3 text-lg font-semibold">Células</h2>
           <form onSubmit={handleCriarCelula} className="flex items-end gap-2">
             <div className="flex-1">
               <label htmlFor="nome-celula" className="block text-sm font-medium text-gray-700">
@@ -232,6 +253,21 @@ export function ManagementPage() {
           {createCelulaFieldErrors && (
             <p className="mt-2 text-sm text-red-600">{Object.values(createCelulaFieldErrors).flat().join(' ')}</p>
           )}
+
+          <div className="mt-3 space-y-2">
+            {celulasDisponiveis.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded border border-gray-200 p-2 text-sm">
+                <span>
+                  {c.nome} <span className="text-gray-400">({c.rede_display})</span>
+                </span>
+                <button onClick={() => dispatch(deleteCelula(c.id))} className="text-xs text-red-600 hover:underline">
+                  Remover
+                </button>
+              </div>
+            ))}
+            {celulasDisponiveis.length === 0 && <p className="text-sm text-gray-500">Nenhuma célula ainda.</p>}
+          </div>
+          {deleteCelulaError && <p className="mt-2 text-sm text-red-600">{deleteCelulaError}</p>}
         </div>
       )}
 
@@ -339,6 +375,7 @@ export function ManagementPage() {
           ))}
           {membrosVisiveis.length === 0 && <p className="text-sm text-gray-500">Nenhum membro ainda.</p>}
         </div>
+        {deleteMembershipError && <p className="mt-2 text-sm text-red-600">{deleteMembershipError}</p>}
       </div>
     </div>
   )
