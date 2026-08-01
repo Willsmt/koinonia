@@ -45,6 +45,12 @@ class PerfilTests(APITestCase):
         self.assertEqual(resp.data["nome_exibicao"], "Aninha")
         self.assertNotIn("password", resp.data)
 
+    def test_me_expoe_cor(self):
+        self._auth()
+        resp = self.client.get(self.url)
+        self.assertIn("cor", resp.data)
+        self.assertIsNone(resp.data["cor"])
+
     def test_perfil_update_bio(self):
         self._auth()
         resp = self.client.patch(self.url, {"bio": "servo"}, format="json")

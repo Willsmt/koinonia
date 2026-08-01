@@ -10,7 +10,7 @@ User = get_user_model()
 class MembershipSerializerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.rede = Rede.objects.create(nome="Rede Azul", cor="azul")
+        cls.rede = Rede.objects.create(nome="Rede Azul", cor="#2563eb")
         cls.celula = Celula.objects.create(nome="Célula 1", rede=cls.rede)
         cls.user = User.objects.create_user(username="ana", password="x")
 

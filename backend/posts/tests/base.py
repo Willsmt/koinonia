@@ -20,8 +20,8 @@ class PostsBaseTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.r1 = Rede.objects.create(nome="Rede Azul", cor="azul")
-        cls.r2 = Rede.objects.create(nome="Rede Branca", cor="branca")
+        cls.r1 = Rede.objects.create(nome="Rede Azul", cor="#2563eb")
+        cls.r2 = Rede.objects.create(nome="Rede Branca", cor="#94a3b8")
         cls.c1a = Celula.objects.create(nome="C1a", rede=cls.r1)
         cls.c1b = Celula.objects.create(nome="C1b", rede=cls.r1)
         cls.c2a = Celula.objects.create(nome="C2a", rede=cls.r2)

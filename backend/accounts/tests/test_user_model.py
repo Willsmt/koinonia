@@ -35,7 +35,7 @@ class CorEscopoTests(TestCase):
         self.assertEqual(u.cor_escopo, "pastor")
 
     def test_member_retorna_cor_da_celula(self):
-        rede = Rede.objects.create(nome="Rede Azul", cor="azul")
+        rede = Rede.objects.create(nome="Rede Azul", cor="#2563eb")
         celula = Celula.objects.create(nome="C1", rede=rede)
         u = User.objects.create_user(
             username="membro",
@@ -44,10 +44,10 @@ class CorEscopoTests(TestCase):
             nome="Membro",
         )
         Membership.objects.create(user=u, role="member", celula=celula)
-        self.assertEqual(u.cor_escopo, "azul")
+        self.assertEqual(u.cor_escopo, "#2563eb")
 
     def test_network_leader_retorna_cor_da_rede(self):
-        rede = Rede.objects.create(nome="Rede Branca", cor="branca")
+        rede = Rede.objects.create(nome="Rede Branca", cor="#94a3b8")
         u = User.objects.create_user(
             username="lider_rede",
             email="lider_rede@ex.com",
@@ -55,4 +55,4 @@ class CorEscopoTests(TestCase):
             nome="Lider Rede",
         )
         Membership.objects.create(user=u, role="network_leader", rede=rede)
-        self.assertEqual(u.cor_escopo, "branca")
+        self.assertEqual(u.cor_escopo, "#94a3b8")

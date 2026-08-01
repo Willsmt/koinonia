@@ -11,6 +11,7 @@ from accounts.validators import (
 
 class UserSerializer(serializers.ModelSerializer):
     nome_exibicao = serializers.CharField(read_only=True)
+    cor = serializers.CharField(source="cor_escopo", read_only=True)
     password = serializers.CharField(
         write_only=True,
         required=False,
@@ -27,6 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             "nome",
             "apelido",
             "nome_exibicao",
+            "cor",
             "telefone",
             "foto",
             "bio",

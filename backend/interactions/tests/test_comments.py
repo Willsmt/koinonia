@@ -54,7 +54,7 @@ class CommentScopingTests(PostsBaseTestCase):
             {"post": self.post_c1a.id, "conteudo": "amém"},
         )
         self.assertEqual(resp.status_code, 201)
-        self.assertEqual(resp.data["author_cor"], "azul")
+        self.assertEqual(resp.data["author_cor"], "#2563eb")
 
 
 class CommentReadScopingTests(PostsBaseTestCase):

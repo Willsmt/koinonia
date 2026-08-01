@@ -6,7 +6,6 @@ from .models import Celula, Membership, Rede
 @admin.register(Rede)
 class RedeAdmin(admin.ModelAdmin):
     list_display = ("nome", "cor")
-    list_filter = ("cor",)
     search_fields = ("nome",)
 
 

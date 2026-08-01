@@ -10,9 +10,9 @@ User = get_user_model()
 class RedePermissionTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.rede = Rede.objects.create(nome="Rede Azul", cor="azul")
+        cls.rede = Rede.objects.create(nome="Rede Azul", cor="#2563eb")
         cls.celula = Celula.objects.create(nome="Célula 1", rede=cls.rede)
-        cls.rede2 = Rede.objects.create(nome="Rede Branca", cor="branca")
+        cls.rede2 = Rede.objects.create(nome="Rede Branca", cor="#94a3b8")
         cls.celula2 = Celula.objects.create(nome="Célula 2", rede=cls.rede2)
 
         cls.pastor = User.objects.create_user(
@@ -40,12 +40,12 @@ class RedePermissionTest(APITestCase):
 
     def test_pastor_cria_rede(self):
         self.client.force_authenticate(self.pastor)
-        r = self.client.post("/api/church/redes/", {"nome": "Nova", "cor": "cinza"})
+        r = self.client.post("/api/church/redes/", {"nome": "Nova", "cor": "#475569"})
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
     def test_lider_celula_nao_cria_rede(self):
         self.client.force_authenticate(self.lider_celula)
-        r = self.client.post("/api/church/redes/", {"nome": "Nova", "cor": "cinza"})
+        r = self.client.post("/api/church/redes/", {"nome": "Nova", "cor": "#475569"})
         self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_anonimo_nao_le(self):

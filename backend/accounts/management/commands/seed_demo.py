@@ -54,7 +54,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         rede, created = Rede.objects.get_or_create(
-            cor="azul", defaults={"nome": "Rede Principal"}
+            nome="Rede Principal", defaults={"cor": "#2563eb"}
         )
         if created:
             self.stdout.write(self.style.SUCCESS(f"Rede criada: {rede.nome}"))
