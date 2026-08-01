@@ -38,8 +38,10 @@ class Post(models.Model):
         blank=True,
         related_name="posts",
     )
-    conteudo = models.TextField()
+    conteudo = models.TextField(blank=True)
+    imagem = models.ImageField(upload_to="posts/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
     objects = PostQuerySet.as_manager()
 
     class Meta:
@@ -56,6 +58,10 @@ class Post(models.Model):
             models.CheckConstraint(
                 name="post_posted_as_so_celula",
                 condition=Q(posted_as__isnull=True) | Q(escopo="celula"),
+            ),
+            models.CheckConstraint(
+                name="post_conteudo_ou_imagem",
+                condition=~Q(conteudo="", imagem=""),
             ),
         ]
         indexes = [

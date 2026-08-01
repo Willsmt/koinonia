@@ -19,14 +19,29 @@ class PostSerializer(serializers.ModelSerializer):
             "rede",
             "posted_as",
             "conteudo",
+            "imagem",
             "created_at",
         ]
         read_only_fields = ["id", "author", "created_at"]
 
+    def validate_imagem(self, value):
+        limite = 5 * 1024 * 1024  # 5MB
+        if value and value.size > limite:
+            raise serializers.ValidationError("Imagem maior que 5MB.")
+        return value
+
     def validate(self, attrs):
+        self._validar_conteudo_ou_imagem(attrs)
         self._validar_estrutura(attrs)
         self._validar_escrita(attrs)
         return attrs
+
+    def _validar_conteudo_ou_imagem(self, attrs):
+        """Espelha o CheckConstraint post_conteudo_ou_imagem. 400."""
+        if not attrs.get("conteudo") and not attrs.get("imagem"):
+            raise serializers.ValidationError(
+                "Post precisa ter texto, imagem, ou os dois — não pode vir vazio."
+            )
 
     def _validar_estrutura(self, attrs):
         """Espelha os CheckConstraint: escopo↔alvo e posted_as só em célula. 400."""
