@@ -25,7 +25,9 @@ class DashboardStatsTests(APITestCase):
         Membership.objects.create(user=cls.lider_r1, role="network_leader", rede=cls.r1)
 
         cls.lider_c1a = cls._user("lider_c1a")
-        Membership.objects.create(user=cls.lider_c1a, role="cell_leader", celula=cls.c1a)
+        Membership.objects.create(
+            user=cls.lider_c1a, role="cell_leader", celula=cls.c1a
+        )
 
         cls.membro_c1a = cls._user("membro_c1a")
         Membership.objects.create(user=cls.membro_c1a, role="member", celula=cls.c1a)
@@ -39,11 +41,21 @@ class DashboardStatsTests(APITestCase):
         cls.solto = cls._user("solto")
 
         # posts espalhados pelos 3 escopos, em células/redes diferentes
-        Post.objects.create(author=cls.membro_c1a, escopo="celula", celula=cls.c1a, conteudo="c1a-1")
-        Post.objects.create(author=cls.membro_c1a, escopo="celula", celula=cls.c1a, conteudo="c1a-2")
-        Post.objects.create(author=cls.membro_c1b, escopo="celula", celula=cls.c1b, conteudo="c1b-1")
-        Post.objects.create(author=cls.membro_c2a, escopo="celula", celula=cls.c2a, conteudo="c2a-1")
-        Post.objects.create(author=cls.lider_r1, escopo="rede", rede=cls.r1, conteudo="r1-1")
+        Post.objects.create(
+            author=cls.membro_c1a, escopo="celula", celula=cls.c1a, conteudo="c1a-1"
+        )
+        Post.objects.create(
+            author=cls.membro_c1a, escopo="celula", celula=cls.c1a, conteudo="c1a-2"
+        )
+        Post.objects.create(
+            author=cls.membro_c1b, escopo="celula", celula=cls.c1b, conteudo="c1b-1"
+        )
+        Post.objects.create(
+            author=cls.membro_c2a, escopo="celula", celula=cls.c2a, conteudo="c2a-1"
+        )
+        Post.objects.create(
+            author=cls.lider_r1, escopo="rede", rede=cls.r1, conteudo="r1-1"
+        )
         Post.objects.create(author=cls.pastor, escopo="global", conteudo="g-1")
 
     @staticmethod
@@ -69,7 +81,9 @@ class DashboardStatsTests(APITestCase):
         self.assertEqual(resp.data["total_membros"], 6)  # todos os Membership criados
         nomes_celulas = {c["nome"] for c in resp.data["membros_por_celula"]}
         self.assertEqual(nomes_celulas, {"C1a", "C1b", "C2a"})
-        self.assertEqual(resp.data["posts_por_escopo"], {"global": 1, "rede": 1, "celula": 4})
+        self.assertEqual(
+            resp.data["posts_por_escopo"], {"global": 1, "rede": 1, "celula": 4}
+        )
 
     def test_lider_de_rede_ve_so_a_propria_rede(self):
         self.client.force_authenticate(self.lider_r1)
@@ -88,5 +102,7 @@ class DashboardStatsTests(APITestCase):
         self.assertEqual(resp.status_code, 200)
         nomes_celulas = {c["nome"] for c in resp.data["membros_por_celula"]}
         self.assertEqual(nomes_celulas, {"C1a"})
-        self.assertEqual(resp.data["posts_por_escopo"]["celula"], 2)  # só os 2 posts de c1a
+        self.assertEqual(
+            resp.data["posts_por_escopo"]["celula"], 2
+        )  # só os 2 posts de c1a
         self.assertEqual(resp.data["celula_mais_ativa"]["nome"], "C1a")

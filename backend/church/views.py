@@ -84,7 +84,10 @@ class DashboardStatsView(APIView):
             .annotate(total=Count("id"))
             .order_by("dia")
         )
-        posts_por_dia = [{"data": p["dia"].isoformat(), "total": p["total"]} for p in posts_por_dia_qs]
+        posts_por_dia = [
+            {"data": p["dia"].isoformat(), "total": p["total"]}
+            for p in posts_por_dia_qs
+        ]
 
         celula_mais_ativa = (
             posts_qs.filter(escopo="celula")
@@ -102,7 +105,10 @@ class DashboardStatsView(APIView):
                 "posts_por_escopo": posts_por_escopo,
                 "posts_por_dia": posts_por_dia,
                 "celula_mais_ativa": (
-                    {"nome": celula_mais_ativa["celula__nome"], "total": celula_mais_ativa["total"]}
+                    {
+                        "nome": celula_mais_ativa["celula__nome"],
+                        "total": celula_mais_ativa["total"],
+                    }
                     if celula_mais_ativa
                     else None
                 ),
