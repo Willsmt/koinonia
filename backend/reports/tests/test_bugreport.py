@@ -84,3 +84,33 @@ class BugReportTests(APITestCase):
         resp = self.client.post(reverse("bugreport-list"), {"descricao": "a" * 2001})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("descricao", resp.data)
+
+    def test_pastor_marca_como_resolvido(self):
+        report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
+        self.client.force_authenticate(self.pastor)
+        resp = self.client.patch(
+            reverse("bugreport-detail", args=[report.id]), {"resolvido": True}, format="json"
+        )
+        self.assertEqual(resp.status_code, 200)
+        report.refresh_from_db()
+        self.assertTrue(report.resolvido)
+
+    def test_membro_nao_marca_como_resolvido(self):
+        report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
+        self.client.force_authenticate(self.membro)
+        resp = self.client.patch(
+            reverse("bugreport-detail", args=[report.id]), {"resolvido": True}, format="json"
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_pastor_deleta_relato(self):
+        report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
+        self.client.force_authenticate(self.pastor)
+        resp = self.client.delete(reverse("bugreport-detail", args=[report.id]))
+        self.assertEqual(resp.status_code, 204)
+
+    def test_membro_nao_deleta_relato(self):
+        report = BugReport.objects.create(reporter=self.membro, descricao="bug x")
+        self.client.force_authenticate(self.membro)
+        resp = self.client.delete(reverse("bugreport-detail", args=[report.id]))
+        self.assertEqual(resp.status_code, 403)

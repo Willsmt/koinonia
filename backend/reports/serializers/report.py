@@ -16,6 +16,7 @@ class BugReportSerializer(serializers.ModelSerializer):
             "descricao",
             "imagem",
             "pagina",
+            "resolvido",
             "created_at",
         ]
         read_only_fields = ["id", "reporter", "created_at"]

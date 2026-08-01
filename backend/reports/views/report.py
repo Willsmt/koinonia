@@ -20,7 +20,7 @@ class BugReportViewSet(viewsets.ModelViewSet):
     queryset = BugReport.objects.select_related("reporter").all()
     serializer_class = BugReportSerializer
     permission_classes = [IsPastorOrCreateOnly]
-    http_method_names = ["get", "post", "head", "options"]
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def perform_create(self, serializer):
         serializer.save(reporter=self.request.user)

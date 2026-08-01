@@ -11,6 +11,7 @@ class BugReport(models.Model):
     descricao = models.TextField(max_length=2000)
     imagem = models.ImageField(upload_to="bug_reports/", blank=True)
     pagina = models.CharField(max_length=500, blank=True)
+    resolvido = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
