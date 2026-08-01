@@ -1,11 +1,11 @@
-import secrets
 import getpass
+import secrets
 
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from church.models import Rede, Membership
+from church.models import Membership, Rede
 from posts.models import Post
 
 User = get_user_model()
