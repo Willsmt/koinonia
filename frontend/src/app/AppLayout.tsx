@@ -5,6 +5,7 @@ import { logout } from '../features/auth/authSlice'
 import { fetchMe } from '../features/auth/profileSlice'
 import { fetchMyFollowing } from '../features/interactions/followSlice'
 import { fetchMyMembership } from '../features/church/churchSlice'
+import { BugReportButton } from '../features/reports/BugReportButton'
 
 export function AppLayout() {
   const dispatch = useAppDispatch()
@@ -35,6 +36,7 @@ export function AppLayout() {
     myMembership?.role === 'cell_leader' ||
     myMembership?.role === 'network_leader' ||
     myMembership?.role === 'pastor'
+  const ehPastor = myMembership?.role === 'pastor'
 
   function handleLogout() {
     dispatch(logout())
@@ -56,6 +58,11 @@ export function AppLayout() {
               Gerenciar membros
             </Link>
           )}
+          {ehPastor && (
+            <Link to="/relatos" className="text-gray-600 hover:text-blue-600">
+              Relatos
+            </Link>
+          )}
           <Link to="/perfil" className="text-gray-600 hover:text-blue-600">
             Perfil
           </Link>
@@ -67,6 +74,7 @@ export function AppLayout() {
       <main className="p-4">
         <Outlet />
       </main>
+      <BugReportButton />
     </div>
   )
 }

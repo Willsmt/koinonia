@@ -7,6 +7,7 @@ import likesReducer from '../features/interactions/likesSlice'
 import commentsReducer from '../features/interactions/commentsSlice'
 import followReducer from '../features/interactions/followSlice'
 import peopleReducer from '../features/people/peopleSlice'
+import reportsReducer from '../features/reports/reportsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     comments: commentsReducer,
     follow: followReducer,
     people: peopleReducer,
+    reports: reportsReducer,
   },
 })
 
