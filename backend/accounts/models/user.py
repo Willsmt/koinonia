@@ -20,5 +20,15 @@ class User(AbstractUser):
     def nome_exibicao(self):
         return self.apelido or self.nome
 
+    @property
+    def cor_escopo(self):
+        """Cor derivada do Membership: cor da rede efetiva, 'pastor' pra pastor, None se solto."""
+        membership = getattr(self, "membership", None)
+        if membership is None:
+            return None
+        if membership.role == "pastor":
+            return "pastor"
+        return membership.rede_efetiva.cor
+
     def __str__(self):
         return f"@{self.username} ({self.nome_exibicao})"

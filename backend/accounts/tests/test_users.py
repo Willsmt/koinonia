@@ -61,6 +61,14 @@ class UserListTests(APITestCase):
         data = resp.data["results"] if isinstance(resp.data, dict) else resp.data
         self.assertEqual({u["username"] for u in data}, {"wills2"})
 
+    def test_expoe_cor_do_escopo(self):
+        self.client.force_authenticate(user=self.wills)
+        resp = self.client.get(reverse("accounts:users"))
+        data = resp.data["results"] if isinstance(resp.data, dict) else resp.data
+        alvo = next(u for u in data if u["username"] == "wills")
+        self.assertIn("cor", alvo)
+        self.assertIsNone(alvo["cor"])  # sem Membership na fixture desta classe
+
 
 class UserDetailTests(APITestCase):
     @classmethod
@@ -93,3 +101,9 @@ class UserDetailTests(APITestCase):
         self.client.force_authenticate(user=self.wills)
         resp = self.client.get(reverse("accounts:user-detail", args=[99999]))
         self.assertEqual(resp.status_code, 404)
+
+    def test_detail_expoe_cor(self):
+        self.client.force_authenticate(user=self.wills)
+        resp = self.client.get(reverse("accounts:user-detail", args=[self.patricia.id]))
+        self.assertIn("cor", resp.data)
+        self.assertIsNone(resp.data["cor"])

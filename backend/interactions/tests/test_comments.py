@@ -47,6 +47,15 @@ class CommentScopingTests(PostsBaseTestCase):
         )
         self.assertEqual(resp.status_code, 400)
 
+    def test_comentario_expoe_author_cor(self):
+        self.client.force_authenticate(user=self.membro_c1a)
+        resp = self.client.post(
+            reverse("comment-list"),
+            {"post": self.post_c1a.id, "conteudo": "amém"},
+        )
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.data["author_cor"], "azul")
+
 
 class CommentReadScopingTests(PostsBaseTestCase):
     def test_nao_lista_comentario_de_post_invisivel(self):
