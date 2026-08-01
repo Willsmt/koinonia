@@ -14,6 +14,7 @@ describe('commentsSlice — regressão do bug de race condition', () => {
       post: 1,
       author: 5,
       author_nome: 'wills2',
+      author_cor: null,
       conteudo: 'que top cara',
       created_at: '2026-08-01T00:00:00Z',
     }

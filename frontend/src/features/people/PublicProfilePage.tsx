@@ -6,6 +6,7 @@ import { fetchAllReadable } from '../posts/postsSlice'
 import { PostCard } from '../posts/PostCard'
 import { FollowButton } from '../interactions/FollowButton'
 import { Avatar } from '../../components/Avatar'
+import { NomeColorido } from '../../components/NomeColorido'
 
 export function PublicProfilePage() {
   const { id } = useParams<{ id: string }>()
@@ -38,7 +39,7 @@ export function PublicProfilePage() {
         <div className="flex items-center gap-4">
           <Avatar src={viewedUser.foto} size="h-16 w-16" zoomable />
           <div className="flex-1">
-            <p className="text-lg font-semibold">{viewedUser.nome_exibicao}</p>
+            <NomeColorido nome={viewedUser.nome_exibicao} cor={viewedUser.cor} className="text-lg font-semibold" />
             <p className="text-sm text-gray-500">@{viewedUser.username}</p>
           </div>
           {myId !== undefined && myId !== userId && <FollowButton userId={userId} />}

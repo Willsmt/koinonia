@@ -9,6 +9,7 @@ import {
   deleteMembership,
 } from './churchSlice'
 import { searchUsers } from '../people/peopleSlice'
+import { NomeColorido } from '../../components/NomeColorido'
 
 const ROLE_LABELS: Record<string, string> = {
   member: 'Membro',
@@ -182,7 +183,7 @@ export function MembersAdminPage() {
           {searchResults.map((u) => (
             <div key={u.id} className="flex items-center justify-between rounded border border-gray-200 p-2 text-sm">
               <span>
-                {u.nome_exibicao} <span className="text-gray-400">@{u.username}</span>
+                <NomeColorido nome={u.nome_exibicao} cor={u.cor} /> <span className="text-gray-400">@{u.username}</span>
               </span>
               <button
                 onClick={() => handleAtribuir(u.id)}

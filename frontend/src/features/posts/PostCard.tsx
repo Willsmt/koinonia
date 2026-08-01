@@ -6,6 +6,7 @@ import { fetchLikes, toggleLike } from '../interactions/likesSlice'
 import { fetchComments, createComment } from '../interactions/commentsSlice'
 import { deletePost } from './postsSlice'
 import { Avatar } from '../../components/Avatar'
+import { NomeColorido } from '../../components/NomeColorido'
 import { FollowButton } from '../interactions/FollowButton'
 
 const ESCOPO_LABELS: Record<Post['escopo'], string> = {
@@ -48,8 +49,8 @@ export function PostCard({ post }: { post: Post }) {
           <Link to={`/pessoas/${post.author}`}>
             <Avatar src={post.author_foto} size="h-9 w-9" />
           </Link>
-          <Link to={`/pessoas/${post.author}`} className="font-medium hover:underline">
-            {post.author_nome}
+          <Link to={`/pessoas/${post.author}`} className="hover:underline">
+            <NomeColorido nome={post.author_nome} cor={post.author_cor} className="font-medium" />
           </Link>
           {myId !== undefined && post.author !== myId && <FollowButton userId={post.author} />}
         </div>
@@ -109,8 +110,8 @@ export function PostCard({ post }: { post: Post }) {
           {commentsInfo?.status === 'loading' && <p className="text-xs text-gray-400">Carregando...</p>}
           {commentsInfo?.items.map((c) => (
             <div key={c.id} className="rounded bg-gray-50 p-2 text-sm">
-              <Link to={`/pessoas/${c.author}`} className="font-medium hover:underline">
-                {c.author_nome}
+              <Link to={`/pessoas/${c.author}`} className="hover:underline">
+                <NomeColorido nome={c.author_nome} cor={c.author_cor} className="font-medium" />
               </Link>
               <p className="text-gray-700">{c.conteudo}</p>
             </div>

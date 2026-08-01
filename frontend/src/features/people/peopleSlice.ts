@@ -6,6 +6,7 @@ export interface PublicUser {
   id: number
   username: string
   nome_exibicao: string
+  cor: string | null
   foto: string | null
   bio: string
   date_joined: string

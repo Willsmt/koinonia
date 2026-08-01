@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { searchUsers } from './peopleSlice'
 import { FollowButton } from '../interactions/FollowButton'
 import { Avatar } from '../../components/Avatar'
+import { NomeColorido } from '../../components/NomeColorido'
 
 export function PeoplePage() {
   const dispatch = useAppDispatch()
@@ -45,7 +46,9 @@ export function PeoplePage() {
             <Link to={`/pessoas/${user.id}`} className="flex items-center gap-3">
               <Avatar src={user.foto} size="h-10 w-10" />
               <div>
-                <p className="font-medium hover:underline">{user.nome_exibicao}</p>
+                <p className="hover:underline">
+                  <NomeColorido nome={user.nome_exibicao} cor={user.cor} className="font-medium" />
+                </p>
                 <p className="text-xs text-gray-500">@{user.username}</p>
               </div>
             </Link>

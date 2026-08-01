@@ -9,6 +9,7 @@ interface Profile {
   nome: string
   apelido: string
   nome_exibicao: string
+  cor: string | null
   telefone: string | null
   foto: string | null
   bio: string

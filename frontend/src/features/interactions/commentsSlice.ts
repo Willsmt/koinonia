@@ -7,6 +7,7 @@ export interface CommentItem {
   post: number
   author: number
   author_nome: string
+  author_cor: string | null
   conteudo: string
   created_at: string
 }

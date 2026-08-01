@@ -8,6 +8,7 @@ export interface Post {
   author: number
   author_nome: string
   author_foto: string | null
+  author_cor: string | null
   escopo: 'celula' | 'rede' | 'global'
   celula: number | null
   rede: number | null

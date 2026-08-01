@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchMe, updateProfile } from './profileSlice'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter'
 import { Avatar } from '../../components/Avatar'
+import { NomeColorido } from '../../components/NomeColorido'
 
 function telefoneMask(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 11)
@@ -119,7 +120,7 @@ export function ProfilePage() {
         <div className="flex items-center gap-4">
           <Avatar src={fotoPreview ?? data.foto} size="h-16 w-16" zoomable />
           <div>
-            <p className="font-semibold">{data.nome_exibicao || data.username}</p>
+            <NomeColorido nome={data.nome_exibicao || data.username} cor={data.cor} className="font-semibold" />
             <p className="text-sm text-gray-500">
               @{data.username} · desde {new Date(data.date_joined).toLocaleDateString('pt-BR')}
             </p>
