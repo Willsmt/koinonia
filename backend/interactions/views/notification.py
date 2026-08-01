@@ -12,7 +12,9 @@ class NotificationViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
-        qs = Notification.objects.filter(recipient=self.request.user).select_related("actor", "post")
+        qs = Notification.objects.filter(recipient=self.request.user).select_related(
+            "actor", "post"
+        )
         lida = self.request.query_params.get("lida")
         if lida is not None:
             qs = qs.filter(lida=lida.lower() == "true")

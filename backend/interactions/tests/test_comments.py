@@ -101,7 +101,9 @@ class CommentNotificationTests(PostsBaseTestCase):
         from interactions.models import Notification
 
         self.client.force_authenticate(user=self.lider_c1a)
-        self.client.post(reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"})
+        self.client.post(
+            reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"}
+        )
         self.assertTrue(
             Notification.objects.filter(
                 recipient=self.membro_c1a,
@@ -115,7 +117,11 @@ class CommentNotificationTests(PostsBaseTestCase):
         from interactions.models import Notification
 
         self.client.force_authenticate(user=self.membro_c1a)
-        self.client.post(reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"})
+        self.client.post(
+            reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"}
+        )
         self.assertFalse(
-            Notification.objects.filter(recipient=self.membro_c1a, actor=self.membro_c1a).exists()
+            Notification.objects.filter(
+                recipient=self.membro_c1a, actor=self.membro_c1a
+            ).exists()
         )

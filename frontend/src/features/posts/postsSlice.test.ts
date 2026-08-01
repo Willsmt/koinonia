@@ -5,6 +5,7 @@ const post: Post = {
   id: 1,
   author: 3,
   author_nome: 'wills',
+  author_foto: null,
   escopo: 'global',
   celula: null,
   rede: null,
