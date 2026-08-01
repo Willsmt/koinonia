@@ -60,3 +60,30 @@ class UserListTests(APITestCase):
         resp = self.client.get(reverse("accounts:users"), {"search": "segundo"})
         data = resp.data["results"] if isinstance(resp.data, dict) else resp.data
         self.assertEqual({u["username"] for u in data}, {"wills2"})
+
+
+class UserDetailTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.wills = User.objects.create_user(
+            username="wills", email="wills@ex.com", password="senha-forte-123", nome="Willians Martins"
+        )
+        cls.patricia = User.objects.create_user(
+            username="patty", email="patty@ex.com", password="senha-forte-123", nome="Patricia Almeida"
+        )
+
+    def test_anonimo_nao_acessa_detail(self):
+        resp = self.client.get(reverse("accounts:user-detail", args=[self.patricia.id]))
+        self.assertEqual(resp.status_code, 401)
+
+    def test_autenticado_ve_perfil_de_outro(self):
+        self.client.force_authenticate(user=self.wills)
+        resp = self.client.get(reverse("accounts:user-detail", args=[self.patricia.id]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["username"], "patty")
+        self.assertNotIn("email", resp.data)
+
+    def test_detail_404_pra_id_inexistente(self):
+        self.client.force_authenticate(user=self.wills)
+        resp = self.client.get(reverse("accounts:user-detail", args=[99999]))
+        self.assertEqual(resp.status_code, 404)

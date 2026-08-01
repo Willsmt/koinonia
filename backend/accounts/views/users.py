@@ -15,3 +15,11 @@ class UserListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["username", "nome", "apelido"]
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    """Perfil público de um usuário específico — qualquer autenticado."""
+
+    queryset = User.objects.all()
+    serializer_class = PublicUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
