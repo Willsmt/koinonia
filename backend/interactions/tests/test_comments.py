@@ -94,3 +94,28 @@ class CommentDeleteTests(PostsBaseTestCase):
             reverse("comment-detail", args=[c.id]), {"conteudo": "editado"}
         )
         self.assertEqual(resp.status_code, 405)
+
+
+class CommentNotificationTests(PostsBaseTestCase):
+    def test_comentar_post_de_outro_gera_notificacao(self):
+        from interactions.models import Notification
+
+        self.client.force_authenticate(user=self.lider_c1a)
+        self.client.post(reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"})
+        self.assertTrue(
+            Notification.objects.filter(
+                recipient=self.membro_c1a,
+                actor=self.lider_c1a,
+                tipo="comment",
+                post=self.post_c1a,
+            ).exists()
+        )
+
+    def test_comentar_proprio_post_nao_gera_notificacao(self):
+        from interactions.models import Notification
+
+        self.client.force_authenticate(user=self.membro_c1a)
+        self.client.post(reverse("comment-list"), {"post": self.post_c1a.id, "conteudo": "bacana"})
+        self.assertFalse(
+            Notification.objects.filter(recipient=self.membro_c1a, actor=self.membro_c1a).exists()
+        )

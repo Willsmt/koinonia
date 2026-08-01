@@ -1,6 +1,6 @@
 from rest_framework import permissions, viewsets
 
-from interactions.models import Comment
+from interactions.models import Comment, Notification
 from interactions.serializers import CommentSerializer
 from interactions.throttling import WriteScopedThrottleMixin
 from posts.models import Post
@@ -30,4 +30,11 @@ class CommentViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        comment = serializer.save(author=self.request.user)
+        if comment.post.author_id != self.request.user.id:
+            Notification.objects.create(
+                recipient=comment.post.author,
+                actor=self.request.user,
+                tipo=Notification.Tipo.COMMENT,
+                post=comment.post,
+            )

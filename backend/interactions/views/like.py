@@ -1,6 +1,6 @@
 from rest_framework import permissions, viewsets
 
-from interactions.models import Like
+from interactions.models import Like, Notification
 from interactions.serializers import LikeSerializer
 from interactions.throttling import WriteScopedThrottleMixin
 from posts.models import Post
@@ -27,4 +27,11 @@ class LikeViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        like = serializer.save(user=self.request.user)
+        if like.post.author_id != self.request.user.id:
+            Notification.objects.create(
+                recipient=like.post.author,
+                actor=self.request.user,
+                tipo=Notification.Tipo.LIKE,
+                post=like.post,
+            )

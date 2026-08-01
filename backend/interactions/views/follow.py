@@ -1,6 +1,6 @@
 from rest_framework import permissions, viewsets
 
-from interactions.models import Follow
+from interactions.models import Follow, Notification
 from interactions.serializers import FollowSerializer
 from interactions.throttling import WriteScopedThrottleMixin
 
@@ -27,4 +27,9 @@ class FollowViewSet(WriteScopedThrottleMixin, viewsets.ModelViewSet):
         return qs.filter(follower=user)  # default: quem eu sigo (seguidos)
 
     def perform_create(self, serializer):
-        serializer.save(follower=self.request.user)
+        follow = serializer.save(follower=self.request.user)
+        Notification.objects.create(
+            recipient=follow.followed,
+            actor=self.request.user,
+            tipo=Notification.Tipo.FOLLOW,
+        )

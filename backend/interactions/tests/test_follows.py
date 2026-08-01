@@ -77,3 +77,16 @@ class FollowDeleteTests(PostsBaseTestCase):
         self.client.force_authenticate(user=self.lider_c1a)
         resp = self.client.delete(reverse("follow-detail", args=[f.id]))
         self.assertEqual(resp.status_code, 404)
+
+
+class FollowNotificationTests(PostsBaseTestCase):
+    def test_seguir_gera_notificacao_pro_seguido(self):
+        from interactions.models import Notification
+
+        self.client.force_authenticate(user=self.membro_c1a)
+        self.client.post(reverse("follow-list"), {"followed": self.pastor.id})
+        self.assertTrue(
+            Notification.objects.filter(
+                recipient=self.pastor, actor=self.membro_c1a, tipo="follow"
+            ).exists()
+        )

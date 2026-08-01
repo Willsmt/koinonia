@@ -43,3 +43,28 @@ class LikeDeleteTests(PostsBaseTestCase):
         self.client.force_authenticate(user=self.lider_c1a)
         resp = self.client.delete(reverse("like-detail", args=[like.id]))
         self.assertEqual(resp.status_code, 403)
+
+
+class LikeNotificationTests(PostsBaseTestCase):
+    def test_curtir_post_de_outro_gera_notificacao(self):
+        from interactions.models import Notification
+
+        self.client.force_authenticate(user=self.lider_c1a)
+        self.client.post(reverse("like-list"), {"post": self.post_c1a.id})
+        self.assertTrue(
+            Notification.objects.filter(
+                recipient=self.membro_c1a,
+                actor=self.lider_c1a,
+                tipo="like",
+                post=self.post_c1a,
+            ).exists()
+        )
+
+    def test_curtir_proprio_post_nao_gera_notificacao(self):
+        from interactions.models import Notification
+
+        self.client.force_authenticate(user=self.membro_c1a)
+        self.client.post(reverse("like-list"), {"post": self.post_c1a.id})
+        self.assertFalse(
+            Notification.objects.filter(recipient=self.membro_c1a, actor=self.membro_c1a).exists()
+        )
