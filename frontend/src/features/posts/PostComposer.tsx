@@ -106,28 +106,31 @@ export function PostComposer() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 rounded-lg bg-white p-4 shadow">
-      <div className="flex gap-4 text-sm">
-        <label className="flex items-center gap-1">
-          <input type="radio" value="global" {...register('escopo')} />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 rounded-[6px] bg-surface p-4 shadow-halo-sm">
+      <div className="flex gap-4 text-sm text-ink-default">
+        <label className="flex items-center gap-1.5">
+          <input type="radio" value="global" {...register('escopo')} className="accent-primary" />
           Global
         </label>
         {canCelula && (
-          <label className="flex items-center gap-1">
-            <input type="radio" value="celula" {...register('escopo')} />
+          <label className="flex items-center gap-1.5">
+            <input type="radio" value="celula" {...register('escopo')} className="accent-primary" />
             Célula
           </label>
         )}
         {canRede && (
-          <label className="flex items-center gap-1">
-            <input type="radio" value="rede" {...register('escopo')} />
+          <label className="flex items-center gap-1.5">
+            <input type="radio" value="rede" {...register('escopo')} className="accent-primary" />
             Rede
           </label>
         )}
       </div>
 
       {escopo === 'celula' && role === 'pastor' && (
-        <select {...register('celula')} className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+        <select
+          {...register('celula')}
+          className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-sm text-ink-strong focus:border-primary focus:outline-none"
+        >
           <option value="">Selecione a célula...</option>
           {celulas.map((c) => (
             <option key={c.id} value={c.id}>
@@ -138,7 +141,10 @@ export function PostComposer() {
       )}
 
       {escopo === 'rede' && role === 'pastor' && (
-        <select {...register('rede')} className="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+        <select
+          {...register('rede')}
+          className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-sm text-ink-strong focus:border-primary focus:outline-none"
+        >
           <option value="">Selecione a rede...</option>
           {redes.map((r) => (
             <option key={r.id} value={r.id}>
@@ -153,19 +159,19 @@ export function PostComposer() {
         rows={3}
         maxLength={3000}
         placeholder="Compartilhe algo com a igreja... (opcional se anexar imagem)"
-        className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+        className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-ink-strong placeholder:text-ink-faint focus:border-primary focus:outline-none"
       />
-      <p className={`text-right text-xs ${(conteudoAtual?.length ?? 0) > 2800 ? 'text-red-600' : 'text-gray-400'}`}>
+      <p className={`text-right text-xs ${(conteudoAtual?.length ?? 0) > 2800 ? 'text-danger' : 'text-ink-faint'}`}>
         {conteudoAtual?.length ?? 0}/3000
       </p>
 
       {imagemPreview && (
         <div className="relative inline-block">
-          <img src={imagemPreview} alt="Prévia" className="max-h-48 rounded-lg object-cover" />
+          <img src={imagemPreview} alt="Prévia" className="max-h-48 rounded-[6px] object-cover" />
           <button
             type="button"
             onClick={limparImagem}
-            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs text-white hover:bg-gray-900"
+            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-overlay-soft text-xs text-white hover:bg-overlay"
           >
             ×
           </button>
@@ -173,28 +179,28 @@ export function PostComposer() {
       )}
 
       <div>
-        <label className="inline-block cursor-pointer rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
+        <label className="inline-block cursor-pointer rounded-full bg-surface-muted px-4 py-2 text-sm font-medium text-ink-default hover:bg-surface-sunken">
           📷 {imagem ? 'Trocar imagem' : 'Anexar imagem'}
           <input type="file" accept="image/*" onChange={handleImagemChange} className="hidden" />
         </label>
       </div>
 
-      {errors.conteudo && <p className="text-sm text-red-600">{errors.conteudo.message}</p>}
-      {errors.celula && <p className="text-sm text-red-600">{errors.celula.message}</p>}
-      {errors.rede && <p className="text-sm text-red-600">{errors.rede.message}</p>}
-      {createFieldErrors?.celula && <p className="text-sm text-red-600">{createFieldErrors.celula[0]}</p>}
-      {createFieldErrors?.rede && <p className="text-sm text-red-600">{createFieldErrors.rede[0]}</p>}
-      {createFieldErrors?.conteudo && <p className="text-sm text-red-600">{createFieldErrors.conteudo[0]}</p>}
-      {createFieldErrors?.imagem && <p className="text-sm text-red-600">{createFieldErrors.imagem[0]}</p>}
+      {errors.conteudo && <p className="text-sm text-danger">{errors.conteudo.message}</p>}
+      {errors.celula && <p className="text-sm text-danger">{errors.celula.message}</p>}
+      {errors.rede && <p className="text-sm text-danger">{errors.rede.message}</p>}
+      {createFieldErrors?.celula && <p className="text-sm text-danger">{createFieldErrors.celula[0]}</p>}
+      {createFieldErrors?.rede && <p className="text-sm text-danger">{createFieldErrors.rede[0]}</p>}
+      {createFieldErrors?.conteudo && <p className="text-sm text-danger">{createFieldErrors.conteudo[0]}</p>}
+      {createFieldErrors?.imagem && <p className="text-sm text-danger">{createFieldErrors.imagem[0]}</p>}
       {createFieldErrors?.non_field_errors && (
-        <p className="text-sm text-red-600">{createFieldErrors.non_field_errors[0]}</p>
+        <p className="text-sm text-danger">{createFieldErrors.non_field_errors[0]}</p>
       )}
-      {createError && <p className="text-sm text-red-600">{createError}</p>}
+      {createError && <p className="text-sm text-danger">{createError}</p>}
 
       <button
         type="submit"
         disabled={createStatus === 'loading'}
-        className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
       >
         {createStatus === 'loading' ? 'Publicando...' : 'Publicar'}
       </button>

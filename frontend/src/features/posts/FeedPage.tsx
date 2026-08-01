@@ -56,16 +56,16 @@ export function FeedPage() {
   const itemsParaExibir = isPastor ? postsParaPastor : feed.items
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
+    <div className="mx-auto max-w-lg space-y-4 py-6 lg:py-0">
       <PostComposer />
 
-      <div className="flex gap-2 rounded-lg bg-white p-1 shadow">
+      <div className="flex gap-1 rounded-full bg-surface p-1 shadow-halo-sm">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`flex-1 rounded px-3 py-1.5 text-sm font-medium ${
-              tab === t.key ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+            className={`flex-1 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
+              tab === t.key ? 'bg-primary text-white' : 'text-ink-muted hover:text-ink-default'
             }`}
           >
             {t.label}
@@ -77,7 +77,7 @@ export function FeedPage() {
         <select
           value={selectedCelula}
           onChange={(e) => setSelectedCelula(e.target.value)}
-          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-sm text-ink-strong focus:border-primary focus:outline-none"
         >
           <option value="">Selecione a célula pra ver os posts...</option>
           {celulas.map((c) => (
@@ -92,7 +92,7 @@ export function FeedPage() {
         <select
           value={selectedRede}
           onChange={(e) => setSelectedRede(e.target.value)}
-          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-sm text-ink-strong focus:border-primary focus:outline-none"
         >
           <option value="">Selecione a rede pra ver os posts...</option>
           {redes.map((r) => (
@@ -104,15 +104,15 @@ export function FeedPage() {
       )}
 
       {!isPastor && feed.status === 'loading' && feed.items.length === 0 && (
-        <p className="text-gray-500">Carregando...</p>
+        <p className="text-ink-subtle">Carregando...</p>
       )}
-      {!isPastor && feed.error && <p className="text-red-600">{feed.error}</p>}
-      {isPastor && allReadable.status === 'loading' && <p className="text-gray-500">Carregando...</p>}
-      {isPastor && allReadable.error && <p className="text-red-600">{allReadable.error}</p>}
+      {!isPastor && feed.error && <p className="text-danger">{feed.error}</p>}
+      {isPastor && allReadable.status === 'loading' && <p className="text-ink-subtle">Carregando...</p>}
+      {isPastor && allReadable.error && <p className="text-danger">{allReadable.error}</p>}
 
       {itemsParaExibir.length === 0 &&
         !(mostrandoSeletorPastor && ((tab === 'celula' && !selectedCelula) || (tab === 'rede' && !selectedRede))) && (
-          <p className="text-gray-500">Nenhum post por aqui ainda.</p>
+          <p className="text-ink-subtle">Nenhum post por aqui ainda.</p>
         )}
 
       <div className="space-y-3">
@@ -125,7 +125,7 @@ export function FeedPage() {
         <button
           onClick={handleLoadMore}
           disabled={feed.status === 'loading'}
-          className="w-full rounded bg-gray-100 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+          className="w-full rounded-full bg-surface-muted py-2 text-sm font-medium text-ink-default hover:bg-surface-sunken disabled:opacity-50"
         >
           {feed.status === 'loading' ? 'Carregando...' : 'Carregar mais'}
         </button>

@@ -21,7 +21,7 @@ describe('fluxo de integração: login → feed', () => {
     )
 
     // sem token → ProtectedRoute redireciona pra /login
-    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Bem-vindo de volta' })).toBeInTheDocument()
 
     await userEvent.type(screen.getByLabelText('Usuário'), 'wills')
     await userEvent.type(screen.getByLabelText('Senha'), 'senha-forte-123')

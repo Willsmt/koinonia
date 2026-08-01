@@ -60,29 +60,29 @@ export function BugReportButton() {
   return (
     <>
       <div className="group fixed bottom-5 right-5 z-40">
-        <span className="pointer-events-none absolute bottom-1/2 right-full mr-3 translate-y-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="pointer-events-none absolute bottom-1/2 right-full mr-3 translate-y-1/2 whitespace-nowrap rounded bg-surface px-2 py-1 text-xs text-ink-strong opacity-0 shadow-halo-sm transition-opacity group-hover:opacity-100">
           Reportar um problema
         </span>
         <button
           onClick={abrir}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-800 text-2xl text-white shadow-lg hover:bg-gray-900"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-border-input bg-surface-muted text-2xl text-ink-strong shadow-halo hover:bg-surface"
         >
           🐞
         </button>
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay-soft p-4">
+          <div className="w-full max-w-sm rounded-lg bg-surface p-6 shadow-halo">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Reportar um problema</h2>
-              <button onClick={fechar} className="text-gray-400 hover:text-gray-600">
+              <h2 className="text-lg font-semibold text-ink-strong">Reportar um problema</h2>
+              <button onClick={fechar} className="text-ink-faint hover:text-ink-strong">
                 ×
               </button>
             </div>
 
             {createStatus === 'succeeded' ? (
-              <p className="text-sm text-green-600">Obrigado! Seu relato foi enviado.</p>
+              <p className="text-sm text-success">Obrigado! Seu relato foi enviado.</p>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3">
                 <textarea
@@ -90,31 +90,27 @@ export function BugReportButton() {
                   onChange={(e) => setDescricao(e.target.value)}
                   rows={4}
                   placeholder="O que aconteceu? Quanto mais detalhe, melhor..."
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-[6px] border border-border-input bg-surface-sunken px-3 py-2 text-sm text-ink-strong placeholder:text-ink-faint focus:border-primary focus:outline-none"
                 />
 
-                {imagemPreview && (
-                  <img src={imagemPreview} alt="Prévia" className="max-h-32 rounded object-cover" />
-                )}
+                {imagemPreview && <img src={imagemPreview} alt="Prévia" className="max-h-32 rounded object-cover" />}
 
-                <label className="inline-block cursor-pointer rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
+                <label className="inline-block cursor-pointer rounded-full bg-surface-muted px-3 py-1.5 text-xs font-medium text-ink-default hover:bg-surface-sunken">
                   📷 {imagem ? 'Trocar print' : 'Anexar print (opcional)'}
                   <input type="file" accept="image/*" onChange={handleImagemChange} className="hidden" />
                 </label>
 
-                <p className="text-xs text-gray-400">Página: {location.pathname}</p>
+                <p className="text-xs text-ink-faint">Página: {location.pathname}</p>
 
-                {erroLocal && <p className="text-sm text-red-600">{erroLocal}</p>}
-                {createFieldErrors?.descricao && (
-                  <p className="text-sm text-red-600">{createFieldErrors.descricao[0]}</p>
-                )}
-                {createFieldErrors?.imagem && <p className="text-sm text-red-600">{createFieldErrors.imagem[0]}</p>}
-                {createError && <p className="text-sm text-red-600">{createError}</p>}
+                {erroLocal && <p className="text-sm text-danger">{erroLocal}</p>}
+                {createFieldErrors?.descricao && <p className="text-sm text-danger">{createFieldErrors.descricao[0]}</p>}
+                {createFieldErrors?.imagem && <p className="text-sm text-danger">{createFieldErrors.imagem[0]}</p>}
+                {createError && <p className="text-sm text-danger">{createError}</p>}
 
                 <button
                   type="submit"
                   disabled={createStatus === 'loading'}
-                  className="w-full rounded bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="w-full rounded-full bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
                 >
                   {createStatus === 'loading' ? 'Enviando...' : 'Enviar relato'}
                 </button>

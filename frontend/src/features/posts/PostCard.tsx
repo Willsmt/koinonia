@@ -43,7 +43,7 @@ export function PostCard({ post }: { post: Post }) {
   }
 
   return (
-    <article className="rounded-lg bg-white p-4 shadow">
+    <article className="rounded-[6px] bg-surface p-4 shadow-halo-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Link to={`/pessoas/${post.author}`}>
@@ -55,7 +55,7 @@ export function PostCard({ post }: { post: Post }) {
           {myId !== undefined && post.author !== myId && <FollowButton userId={post.author} />}
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+          <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-ink-subtle">
             {ESCOPO_LABELS[post.escopo]}
           </span>
           {myId === post.author && (
@@ -65,7 +65,7 @@ export function PostCard({ post }: { post: Post }) {
                   dispatch(deletePost(post.id))
                 }
               }}
-              className="text-xs text-gray-400 hover:text-red-600"
+              className="text-xs text-ink-faint hover:text-danger"
               title="Excluir post"
             >
               🗑
@@ -74,46 +74,46 @@ export function PostCard({ post }: { post: Post }) {
         </div>
       </div>
 
-      {post.conteudo && <p className="mt-2 whitespace-pre-wrap break-words text-gray-800">{post.conteudo}</p>}
+      {post.conteudo && <p className="mt-2 whitespace-pre-wrap break-words text-ink-default">{post.conteudo}</p>}
       {post.imagem && (
         <img
           src={post.imagem}
           alt=""
           onClick={() => setImagemAmpliada(true)}
-          className="mt-2 max-h-96 w-full cursor-zoom-in rounded-lg object-cover"
+          className="mt-2 max-h-96 w-full cursor-zoom-in rounded-[6px] object-cover"
         />
       )}
       {post.imagem && imagemAmpliada && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4"
           onClick={() => setImagemAmpliada(false)}
         >
-          <img src={post.imagem} alt="" className="max-h-[80vh] max-w-[90vw] rounded-lg object-contain" />
+          <img src={post.imagem} alt="" className="max-h-[80vh] max-w-[90vw] rounded-[6px] object-contain" />
         </div>
       )}
-      <p className="mt-2 text-xs text-gray-400">{new Date(post.created_at).toLocaleString('pt-BR')}</p>
+      <p className="mt-2 text-xs text-ink-faint">{new Date(post.created_at).toLocaleString('pt-BR')}</p>
 
-      <div className="mt-3 flex items-center gap-4 border-t pt-2 text-sm">
+      <div className="mt-3 flex items-center gap-4 border-t border-border pt-2 text-sm">
         <button
           onClick={() => dispatch(toggleLike({ postId: post.id }))}
-          className={`flex items-center gap-1 ${likeInfo?.likedByMe ? 'text-red-600' : 'text-gray-500'}`}
+          className={`flex items-center gap-1 ${likeInfo?.likedByMe ? 'text-danger' : 'text-ink-subtle'}`}
         >
           {likeInfo?.likedByMe ? '♥' : '♡'} {likeInfo?.count ?? 0}
         </button>
-        <button onClick={() => setShowComments((v) => !v)} className="text-gray-500">
+        <button onClick={() => setShowComments((v) => !v)} className="text-ink-subtle">
           💬 {commentsInfo?.items.length ?? 0} Comentar
         </button>
       </div>
 
       {showComments && (
-        <div className="mt-3 space-y-2 border-t pt-2">
-          {commentsInfo?.status === 'loading' && <p className="text-xs text-gray-400">Carregando...</p>}
+        <div className="mt-3 space-y-2 border-t border-border pt-2">
+          {commentsInfo?.status === 'loading' && <p className="text-xs text-ink-faint">Carregando...</p>}
           {commentsInfo?.items.map((c) => (
-            <div key={c.id} className="rounded bg-gray-50 p-2 text-sm">
+            <div key={c.id} className="rounded-[6px] bg-surface-sunken p-2 text-sm">
               <Link to={`/pessoas/${c.author}`} className="hover:underline">
                 <NomeColorido nome={c.author_nome} cor={c.author_cor} className="font-medium" />
               </Link>
-              <p className="text-gray-700">{c.conteudo}</p>
+              <p className="text-ink-default">{c.conteudo}</p>
             </div>
           ))}
           <div className="flex gap-2">
@@ -121,11 +121,11 @@ export function PostCard({ post }: { post: Post }) {
               value={novoComentario}
               onChange={(e) => setNovoComentario(e.target.value)}
               placeholder="Escreva um comentário..."
-              className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
+              className="flex-1 rounded-[6px] border border-border-input bg-surface-sunken px-2 py-1 text-sm text-ink-strong placeholder:text-ink-faint focus:border-primary focus:outline-none"
             />
             <button
               onClick={handleEnviarComentario}
-              className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
+              className="rounded-full bg-primary px-3 py-1 text-sm text-white hover:bg-primary-hover"
             >
               Enviar
             </button>
