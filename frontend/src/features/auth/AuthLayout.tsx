@@ -26,7 +26,7 @@ export function AuthLayout({ children, activeTab }: AuthLayoutProps) {
 
         <div className="relative z-10 mt-8 max-w-md lg:mt-0">
           <h1 className="font-display text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-[54px] lg:leading-[1.05]">
-            Sua igreja, em rede.
+            Sua igreja, em célula.
           </h1>
           <p className="mt-3 hidden text-base leading-relaxed text-white/80 sm:block lg:mt-5 lg:text-[17px]">
             Células, redes e a igreja inteira num só feed — com o cuidado de saber quem está por perto.
