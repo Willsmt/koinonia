@@ -24,6 +24,35 @@ organizado em bounded contexts:
 O controle de acesso do sistema deriva de uma única fonte: o `Membership`
 (papel + escopo). Não há tipos de usuário distintos nem permissão espalhada.
 
+### Diagramas
+
+| Arquitetura de referência (conceitual) | Deploy em produção |
+| --- | --- |
+| ![Arquitetura de referência](arquitetura/arquitetura-referencia.png) | ![Deploy em produção](arquitetura/deploy-producao.png) |
+
+![Diagrama ER do banco de dados](arquitetura/der-banco-dados.png)
+
+<details>
+<summary>Fluxo de onboarding (cadastro, login e entrada em célula)</summary>
+
+![Fluxo de onboarding](arquitetura/fluxo-onboarding.png)
+
+</details>
+
+<details>
+<summary>Fluxo de criação de post (escopo célula / rede / global)</summary>
+
+![Fluxo de criação de post](arquitetura/fluxo-criacao-post.png)
+
+</details>
+
+<details>
+<summary>Fluxos de interação social (seguir, curtir, comentar, feed global)</summary>
+
+![Fluxo de interação social](arquitetura/fluxo-interacao-social.png)
+
+</details>
+
 ## Stack
 
 - Back-end: Python 3.14, Django 6, Django REST Framework, PostgreSQL
